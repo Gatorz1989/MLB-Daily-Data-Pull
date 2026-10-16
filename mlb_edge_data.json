@@ -1,31 +1,8 @@
 {
-  "generated_at": "2026-10-16T03:09:10.065811+00:00",
+  "generated_at": "2026-10-16T03:41:30.990642+00:00",
   "pull_date": "2026-10-16",
-  "version": "mlb_edge_data_pull/v1.0",
+  "version": "mlb_edge_data_pull/v1.1",
   "games": [
-    {
-      "eventId": "ab3e5655be6b32e0853d683e51a60baa",
-      "homeTeam": "Los Angeles Dodgers",
-      "awayTeam": "Milwaukee Brewers",
-      "time": "8:08 PM ET",
-      "park": "Los Angeles Dodgers Park",
-      "homeTeamSlug": "los_angeles_dodgers",
-      "homePitcher": "TBD",
-      "awayPitcher": "TBD",
-      "homeERA": 0,
-      "awayERA": 0,
-      "homeK9": 0,
-      "awayK9": 0,
-      "homeWHIP": 0,
-      "awayWHIP": 0,
-      "homeML": 3500,
-      "awayML": -50000,
-      "total": 10.5,
-      "homeRL": 1140,
-      "awayRL": 0,
-      "homeRLEdge": 0,
-      "awayRLEdge": 0
-    },
     {
       "eventId": "b9d2e07cf437b5643307aba274c45a74",
       "homeTeam": "Cleveland Guardians",
@@ -52,78 +29,6 @@
   ],
   "props": [
     {
-      "player": "Shohei Ohtani",
-      "team": "",
-      "propType": "H",
-      "line": 1.5,
-      "book": "draftkings",
-      "odds": 1300,
-      "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
-    },
-    {
-      "player": "Mookie Betts",
-      "team": "",
-      "propType": "H",
-      "line": 0.5,
-      "book": "draftkings",
-      "odds": 2800,
-      "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
-    },
-    {
-      "player": "Tommy Edman",
-      "team": "",
-      "propType": "RBI",
-      "line": 0.5,
-      "book": "draftkings",
-      "odds": 3000,
-      "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
-    },
-    {
-      "player": "Tommy Edman",
-      "team": "",
-      "propType": "R",
-      "line": 0.5,
-      "book": "draftkings",
-      "odds": 600,
-      "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
-    },
-    {
-      "player": "Shohei Ohtani",
-      "team": "",
-      "propType": "TB",
-      "line": 4.5,
-      "book": "draftkings",
-      "odds": 1300,
-      "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
-    },
-    {
-      "player": "Tommy Edman",
-      "team": "",
-      "propType": "BB",
-      "line": 0.5,
-      "book": "draftkings",
-      "odds": 850,
-      "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
-    },
-    {
       "player": "Yandy Diaz",
       "team": "",
       "propType": "H",
@@ -143,9 +48,9 @@
       "book": "draftkings",
       "odds": -223,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.01,
+      "edge": 101.4,
+      "tier": "ELITE"
     },
     {
       "player": "Chandler Simpson",
@@ -155,9 +60,9 @@
       "book": "draftkings",
       "odds": -208,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.16,
+      "edge": 131.8,
+      "tier": "ELITE"
     },
     {
       "player": "Jose Ramirez",
@@ -179,9 +84,9 @@
       "book": "draftkings",
       "odds": -199,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.05,
+      "edge": 109.8,
+      "tier": "ELITE"
     },
     {
       "player": "Chase DeLauter",
@@ -191,9 +96,9 @@
       "book": "draftkings",
       "odds": -194,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.07,
+      "edge": 113.6,
+      "tier": "ELITE"
     },
     {
       "player": "Jo Adell",
@@ -203,9 +108,9 @@
       "book": "draftkings",
       "odds": -173,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.91,
+      "edge": 82.4,
+      "tier": "ELITE"
     },
     {
       "player": "Jonathan Aranda",
@@ -215,9 +120,9 @@
       "book": "draftkings",
       "odds": -171,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.03,
+      "edge": 105.2,
+      "tier": "ELITE"
     },
     {
       "player": "Victor Mesa Jr.",
@@ -239,9 +144,9 @@
       "book": "draftkings",
       "odds": -159,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.96,
+      "edge": 91.6,
+      "tier": "ELITE"
     },
     {
       "player": "Jonny Deluca",
@@ -275,9 +180,9 @@
       "book": "draftkings",
       "odds": -139,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.89,
+      "edge": 77.4,
+      "tier": "ELITE"
     },
     {
       "player": "Brayan Rocchio",
@@ -287,9 +192,9 @@
       "book": "draftkings",
       "odds": -132,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.88,
+      "edge": 76.4,
+      "tier": "ELITE"
     },
     {
       "player": "Patrick Bailey",
@@ -347,9 +252,9 @@
       "book": "draftkings",
       "odds": 210,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.59,
+      "edge": 18.2,
+      "tier": "ELITE"
     },
     {
       "player": "Jose Ramirez",
@@ -371,8 +276,8 @@
       "book": "draftkings",
       "odds": 241,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.5,
+      "edge": 0.8,
       "tier": "SKIP"
     },
     {
@@ -407,8 +312,8 @@
       "book": "draftkings",
       "odds": 319,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.46,
+      "edge": -8.0,
       "tier": "SKIP"
     },
     {
@@ -431,8 +336,8 @@
       "book": "draftkings",
       "odds": 342,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.48,
+      "edge": -4.6,
       "tier": "SKIP"
     },
     {
@@ -443,8 +348,8 @@
       "book": "draftkings",
       "odds": 375,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.21,
+      "edge": -57.6,
       "tier": "SKIP"
     },
     {
@@ -467,9 +372,9 @@
       "book": "draftkings",
       "odds": 154,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.01,
+      "edge": 101.4,
+      "tier": "ELITE"
     },
     {
       "player": "Jo Adell",
@@ -479,9 +384,9 @@
       "book": "draftkings",
       "odds": 167,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.91,
+      "edge": 82.4,
+      "tier": "ELITE"
     },
     {
       "player": "Chase DeLauter",
@@ -491,9 +396,9 @@
       "book": "draftkings",
       "odds": 170,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.07,
+      "edge": 113.6,
+      "tier": "ELITE"
     },
     {
       "player": "Nathaniel Lowe",
@@ -515,9 +420,9 @@
       "book": "draftkings",
       "odds": 213,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.89,
+      "edge": 77.4,
+      "tier": "ELITE"
     },
     {
       "player": "Patrick Bailey",
@@ -539,9 +444,9 @@
       "book": "draftkings",
       "odds": 228,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.88,
+      "edge": 76.4,
+      "tier": "ELITE"
     },
     {
       "player": "Petey Halpin",
@@ -563,9 +468,9 @@
       "book": "draftkings",
       "odds": 137,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 1.99,
+      "edge": 32.9,
+      "tier": "ELITE"
     },
     {
       "player": "Yandy Diaz",
@@ -599,8 +504,8 @@
       "book": "draftkings",
       "odds": 160,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 1.25,
+      "edge": -17.0,
       "tier": "SKIP"
     },
     {
@@ -611,8 +516,8 @@
       "book": "draftkings",
       "odds": 187,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.45,
+      "edge": -9.8,
       "tier": "SKIP"
     },
     {
@@ -623,9 +528,9 @@
       "book": "draftkings",
       "odds": 208,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 0.56,
+      "edge": 12.6,
+      "tier": "ELITE"
     },
     {
       "player": "Nathaniel Lowe",
@@ -659,8 +564,8 @@
       "book": "draftkings",
       "odds": 255,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.45,
+      "edge": -9.6,
       "tier": "SKIP"
     },
     {
@@ -671,8 +576,8 @@
       "book": "draftkings",
       "odds": 265,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.21,
+      "edge": -57.2,
       "tier": "SKIP"
     },
     {
@@ -695,8 +600,8 @@
       "book": "draftkings",
       "odds": 362,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
+      "projection": 0.25,
+      "edge": -50.4,
       "tier": "SKIP"
     },
     {
@@ -755,9 +660,9 @@
       "book": "draftkings",
       "odds": 111,
       "isManual": false,
-      "projection": 0.0,
-      "edge": 0.0,
-      "tier": "SKIP"
+      "projection": 3.52,
+      "edge": 40.6,
+      "tier": "ELITE"
     },
     {
       "player": "Nick Martinez",
@@ -772,14 +677,1828 @@
       "tier": "SKIP"
     }
   ],
-  "batters": [],
-  "pitchers": [],
+  "batters": [
+    {
+      "name": "Yordan Alvarez",
+      "team": "",
+      "avg": 0.316,
+      "obp": 0.432,
+      "slg": 0.601,
+      "ops": 1.033,
+      "hr": 42,
+      "rbi": 106
+    },
+    {
+      "name": "Gabriel Moreno",
+      "team": "",
+      "avg": 0.311,
+      "obp": 0.388,
+      "slg": 0.486,
+      "ops": 0.874,
+      "hr": 16,
+      "rbi": 83
+    },
+    {
+      "name": "Luis Arraez",
+      "team": "",
+      "avg": 0.31,
+      "obp": 0.345,
+      "slg": 0.419,
+      "ops": 0.764,
+      "hr": 6,
+      "rbi": 64
+    },
+    {
+      "name": "Chandler Simpson",
+      "team": "",
+      "avg": 0.306,
+      "obp": 0.333,
+      "slg": 0.356,
+      "ops": 0.689,
+      "hr": 0,
+      "rbi": 38
+    },
+    {
+      "name": "Otto Lopez",
+      "team": "",
+      "avg": 0.305,
+      "obp": 0.349,
+      "slg": 0.437,
+      "ops": 0.786,
+      "hr": 11,
+      "rbi": 71
+    },
+    {
+      "name": "Nick Gonzales",
+      "team": "",
+      "avg": 0.303,
+      "obp": 0.367,
+      "slg": 0.388,
+      "ops": 0.755,
+      "hr": 6,
+      "rbi": 61
+    },
+    {
+      "name": "TJ Rumfield",
+      "team": "",
+      "avg": 0.3,
+      "obp": 0.39,
+      "slg": 0.453,
+      "ops": 0.843,
+      "hr": 16,
+      "rbi": 73
+    },
+    {
+      "name": "Michael Harris II",
+      "team": "",
+      "avg": 0.294,
+      "obp": 0.321,
+      "slg": 0.491,
+      "ops": 0.812,
+      "hr": 26,
+      "rbi": 87
+    },
+    {
+      "name": "Yandy D\u00edaz",
+      "team": "",
+      "avg": 0.293,
+      "obp": 0.359,
+      "slg": 0.446,
+      "ops": 0.805,
+      "hr": 22,
+      "rbi": 85
+    },
+    {
+      "name": "Jackson Chourio",
+      "team": "",
+      "avg": 0.291,
+      "obp": 0.351,
+      "slg": 0.487,
+      "ops": 0.838,
+      "hr": 25,
+      "rbi": 75
+    },
+    {
+      "name": "Jake McCarthy",
+      "team": "",
+      "avg": 0.291,
+      "obp": 0.334,
+      "slg": 0.475,
+      "ops": 0.809,
+      "hr": 15,
+      "rbi": 83
+    },
+    {
+      "name": "Fernando Tatis Jr.",
+      "team": "",
+      "avg": 0.289,
+      "obp": 0.358,
+      "slg": 0.47,
+      "ops": 0.828,
+      "hr": 25,
+      "rbi": 83
+    },
+    {
+      "name": "Jac Caglianone",
+      "team": "",
+      "avg": 0.289,
+      "obp": 0.34,
+      "slg": 0.494,
+      "ops": 0.834,
+      "hr": 23,
+      "rbi": 75
+    },
+    {
+      "name": "Freddie Freeman",
+      "team": "",
+      "avg": 0.288,
+      "obp": 0.362,
+      "slg": 0.43,
+      "ops": 0.792,
+      "hr": 16,
+      "rbi": 70
+    },
+    {
+      "name": "Chase DeLauter",
+      "team": "",
+      "avg": 0.287,
+      "obp": 0.363,
+      "slg": 0.457,
+      "ops": 0.82,
+      "hr": 16,
+      "rbi": 67
+    },
+    {
+      "name": "Ceddanne Rafaela",
+      "team": "",
+      "avg": 0.285,
+      "obp": 0.321,
+      "slg": 0.444,
+      "ops": 0.765,
+      "hr": 16,
+      "rbi": 70
+    },
+    {
+      "name": "Drake Baldwin",
+      "team": "",
+      "avg": 0.284,
+      "obp": 0.358,
+      "slg": 0.459,
+      "ops": 0.817,
+      "hr": 25,
+      "rbi": 79
+    },
+    {
+      "name": "Liam Hicks",
+      "team": "",
+      "avg": 0.284,
+      "obp": 0.367,
+      "slg": 0.434,
+      "ops": 0.801,
+      "hr": 18,
+      "rbi": 82
+    },
+    {
+      "name": "Elly De La Cruz",
+      "team": "",
+      "avg": 0.283,
+      "obp": 0.365,
+      "slg": 0.515,
+      "ops": 0.88,
+      "hr": 30,
+      "rbi": 79
+    },
+    {
+      "name": "Carson Benge",
+      "team": "",
+      "avg": 0.282,
+      "obp": 0.346,
+      "slg": 0.43,
+      "ops": 0.776,
+      "hr": 20,
+      "rbi": 65
+    },
+    {
+      "name": "Luke Keaschall",
+      "team": "",
+      "avg": 0.282,
+      "obp": 0.374,
+      "slg": 0.407,
+      "ops": 0.781,
+      "hr": 10,
+      "rbi": 52
+    },
+    {
+      "name": "Steven Kwan",
+      "team": "",
+      "avg": 0.282,
+      "obp": 0.382,
+      "slg": 0.349,
+      "ops": 0.731,
+      "hr": 3,
+      "rbi": 32
+    },
+    {
+      "name": "Randy Arozarena",
+      "team": "",
+      "avg": 0.281,
+      "obp": 0.381,
+      "slg": 0.484,
+      "ops": 0.865,
+      "hr": 26,
+      "rbi": 79
+    },
+    {
+      "name": "Bobby Witt Jr.",
+      "team": "",
+      "avg": 0.281,
+      "obp": 0.359,
+      "slg": 0.441,
+      "ops": 0.8,
+      "hr": 18,
+      "rbi": 54
+    },
+    {
+      "name": "Xavier Edwards",
+      "team": "",
+      "avg": 0.28,
+      "obp": 0.36,
+      "slg": 0.371,
+      "ops": 0.731,
+      "hr": 6,
+      "rbi": 52
+    },
+    {
+      "name": "Riley Greene",
+      "team": "",
+      "avg": 0.28,
+      "obp": 0.37,
+      "slg": 0.474,
+      "ops": 0.844,
+      "hr": 21,
+      "rbi": 75
+    },
+    {
+      "name": "Pete Crow-Armstrong",
+      "team": "",
+      "avg": 0.28,
+      "obp": 0.372,
+      "slg": 0.57,
+      "ops": 0.942,
+      "hr": 45,
+      "rbi": 107
+    },
+    {
+      "name": "Alec Burleson",
+      "team": "",
+      "avg": 0.279,
+      "obp": 0.343,
+      "slg": 0.473,
+      "ops": 0.816,
+      "hr": 26,
+      "rbi": 116
+    },
+    {
+      "name": "Kevin McGonigle",
+      "team": "",
+      "avg": 0.278,
+      "obp": 0.376,
+      "slg": 0.43,
+      "ops": 0.806,
+      "hr": 18,
+      "rbi": 72
+    },
+    {
+      "name": "Luis Garc\u00eda Jr.",
+      "team": "",
+      "avg": 0.277,
+      "obp": 0.309,
+      "slg": 0.521,
+      "ops": 0.83,
+      "hr": 30,
+      "rbi": 92
+    },
+    {
+      "name": "Sam Antonacci",
+      "team": "",
+      "avg": 0.277,
+      "obp": 0.37,
+      "slg": 0.396,
+      "ops": 0.766,
+      "hr": 8,
+      "rbi": 48
+    },
+    {
+      "name": "Jung Hoo Lee",
+      "team": "",
+      "avg": 0.276,
+      "obp": 0.32,
+      "slg": 0.404,
+      "ops": 0.724,
+      "hr": 10,
+      "rbi": 57
+    },
+    {
+      "name": "Mauricio Dub\u00f3n",
+      "team": "",
+      "avg": 0.276,
+      "obp": 0.321,
+      "slg": 0.399,
+      "ops": 0.72,
+      "hr": 12,
+      "rbi": 73
+    },
+    {
+      "name": "Junior Caminero",
+      "team": "",
+      "avg": 0.276,
+      "obp": 0.36,
+      "slg": 0.524,
+      "ops": 0.884,
+      "hr": 42,
+      "rbi": 101
+    },
+    {
+      "name": "Chase Meidroth",
+      "team": "",
+      "avg": 0.276,
+      "obp": 0.35,
+      "slg": 0.415,
+      "ops": 0.765,
+      "hr": 16,
+      "rbi": 63
+    },
+    {
+      "name": "Shohei Ohtani",
+      "team": "",
+      "avg": 0.275,
+      "obp": 0.377,
+      "slg": 0.512,
+      "ops": 0.889,
+      "hr": 30,
+      "rbi": 81
+    },
+    {
+      "name": "Willson Contreras",
+      "team": "",
+      "avg": 0.275,
+      "obp": 0.386,
+      "slg": 0.516,
+      "ops": 0.902,
+      "hr": 27,
+      "rbi": 81
+    },
+    {
+      "name": "Jonathan Aranda",
+      "team": "",
+      "avg": 0.274,
+      "obp": 0.358,
+      "slg": 0.434,
+      "ops": 0.792,
+      "hr": 22,
+      "rbi": 92
+    },
+    {
+      "name": "Andy Pages",
+      "team": "",
+      "avg": 0.274,
+      "obp": 0.343,
+      "slg": 0.468,
+      "ops": 0.811,
+      "hr": 23,
+      "rbi": 85
+    },
+    {
+      "name": "William Contreras",
+      "team": "",
+      "avg": 0.27,
+      "obp": 0.341,
+      "slg": 0.417,
+      "ops": 0.758,
+      "hr": 18,
+      "rbi": 94
+    },
+    {
+      "name": "Seiya Suzuki",
+      "team": "",
+      "avg": 0.27,
+      "obp": 0.368,
+      "slg": 0.473,
+      "ops": 0.841,
+      "hr": 26,
+      "rbi": 86
+    },
+    {
+      "name": "Jordan Walker",
+      "team": "",
+      "avg": 0.269,
+      "obp": 0.327,
+      "slg": 0.466,
+      "ops": 0.793,
+      "hr": 29,
+      "rbi": 102
+    },
+    {
+      "name": "Bryce Harper",
+      "team": "",
+      "avg": 0.269,
+      "obp": 0.38,
+      "slg": 0.485,
+      "ops": 0.865,
+      "hr": 29,
+      "rbi": 87
+    },
+    {
+      "name": "Brice Turang",
+      "team": "",
+      "avg": 0.268,
+      "obp": 0.366,
+      "slg": 0.45,
+      "ops": 0.816,
+      "hr": 21,
+      "rbi": 100
+    },
+    {
+      "name": "Pete Alonso",
+      "team": "",
+      "avg": 0.267,
+      "obp": 0.363,
+      "slg": 0.522,
+      "ops": 0.885,
+      "hr": 43,
+      "rbi": 113
+    },
+    {
+      "name": "Jake Bauers",
+      "team": "",
+      "avg": 0.266,
+      "obp": 0.389,
+      "slg": 0.484,
+      "ops": 0.873,
+      "hr": 26,
+      "rbi": 86
+    },
+    {
+      "name": "James Wood",
+      "team": "",
+      "avg": 0.265,
+      "obp": 0.388,
+      "slg": 0.503,
+      "ops": 0.891,
+      "hr": 30,
+      "rbi": 77
+    },
+    {
+      "name": "Alex Bregman",
+      "team": "",
+      "avg": 0.265,
+      "obp": 0.355,
+      "slg": 0.464,
+      "ops": 0.819,
+      "hr": 28,
+      "rbi": 93
+    },
+    {
+      "name": "Dominic Canzone",
+      "team": "",
+      "avg": 0.264,
+      "obp": 0.336,
+      "slg": 0.484,
+      "ops": 0.82,
+      "hr": 23,
+      "rbi": 77
+    },
+    {
+      "name": "Cody Bellinger",
+      "team": "",
+      "avg": 0.264,
+      "obp": 0.338,
+      "slg": 0.429,
+      "ops": 0.767,
+      "hr": 17,
+      "rbi": 73
+    },
+    {
+      "name": "Jeff McNeil",
+      "team": "",
+      "avg": 0.264,
+      "obp": 0.313,
+      "slg": 0.368,
+      "ops": 0.681,
+      "hr": 9,
+      "rbi": 59
+    },
+    {
+      "name": "Ben Rice",
+      "team": "",
+      "avg": 0.264,
+      "obp": 0.363,
+      "slg": 0.534,
+      "ops": 0.897,
+      "hr": 41,
+      "rbi": 97
+    },
+    {
+      "name": "Sal Stewart",
+      "team": "",
+      "avg": 0.263,
+      "obp": 0.33,
+      "slg": 0.457,
+      "ops": 0.787,
+      "hr": 32,
+      "rbi": 112
+    },
+    {
+      "name": "Nico Hoerner",
+      "team": "",
+      "avg": 0.263,
+      "obp": 0.316,
+      "slg": 0.35,
+      "ops": 0.666,
+      "hr": 8,
+      "rbi": 72
+    },
+    {
+      "name": "Garrett Mitchell",
+      "team": "",
+      "avg": 0.262,
+      "obp": 0.354,
+      "slg": 0.416,
+      "ops": 0.77,
+      "hr": 11,
+      "rbi": 65
+    },
+    {
+      "name": "Isaac Paredes",
+      "team": "",
+      "avg": 0.262,
+      "obp": 0.36,
+      "slg": 0.447,
+      "ops": 0.807,
+      "hr": 25,
+      "rbi": 94
+    },
+    {
+      "name": "Geraldo Perdomo",
+      "team": "",
+      "avg": 0.262,
+      "obp": 0.37,
+      "slg": 0.377,
+      "ops": 0.747,
+      "hr": 9,
+      "rbi": 59
+    },
+    {
+      "name": "Josh Naylor",
+      "team": "",
+      "avg": 0.261,
+      "obp": 0.317,
+      "slg": 0.35,
+      "ops": 0.667,
+      "hr": 10,
+      "rbi": 57
+    },
+    {
+      "name": "CJ Abrams",
+      "team": "",
+      "avg": 0.261,
+      "obp": 0.336,
+      "slg": 0.497,
+      "ops": 0.833,
+      "hr": 33,
+      "rbi": 106
+    },
+    {
+      "name": "Bryan Reynolds",
+      "team": "",
+      "avg": 0.261,
+      "obp": 0.365,
+      "slg": 0.424,
+      "ops": 0.789,
+      "hr": 17,
+      "rbi": 72
+    },
+    {
+      "name": "Brandon Lowe",
+      "team": "",
+      "avg": 0.26,
+      "obp": 0.331,
+      "slg": 0.493,
+      "ops": 0.824,
+      "hr": 35,
+      "rbi": 96
+    },
+    {
+      "name": "Bo Bichette",
+      "team": "",
+      "avg": 0.26,
+      "obp": 0.312,
+      "slg": 0.39,
+      "ops": 0.702,
+      "hr": 18,
+      "rbi": 78
+    },
+    {
+      "name": "Vladimir Guerrero Jr.",
+      "team": "",
+      "avg": 0.26,
+      "obp": 0.332,
+      "slg": 0.356,
+      "ops": 0.688,
+      "hr": 9,
+      "rbi": 57
+    },
+    {
+      "name": "Ezequiel Duran",
+      "team": "",
+      "avg": 0.26,
+      "obp": 0.32,
+      "slg": 0.419,
+      "ops": 0.739,
+      "hr": 17,
+      "rbi": 83
+    },
+    {
+      "name": "Brandon Nimmo",
+      "team": "",
+      "avg": 0.26,
+      "obp": 0.324,
+      "slg": 0.405,
+      "ops": 0.729,
+      "hr": 14,
+      "rbi": 62
+    },
+    {
+      "name": "Brandon Marsh",
+      "team": "",
+      "avg": 0.26,
+      "obp": 0.304,
+      "slg": 0.408,
+      "ops": 0.712,
+      "hr": 18,
+      "rbi": 62
+    },
+    {
+      "name": "Ernie Clement",
+      "team": "",
+      "avg": 0.259,
+      "obp": 0.285,
+      "slg": 0.364,
+      "ops": 0.649,
+      "hr": 9,
+      "rbi": 48
+    },
+    {
+      "name": "Rafael Devers",
+      "team": "",
+      "avg": 0.258,
+      "obp": 0.34,
+      "slg": 0.525,
+      "ops": 0.865,
+      "hr": 37,
+      "rbi": 98
+    },
+    {
+      "name": "Mookie Betts",
+      "team": "",
+      "avg": 0.257,
+      "obp": 0.326,
+      "slg": 0.454,
+      "ops": 0.78,
+      "hr": 23,
+      "rbi": 69
+    },
+    {
+      "name": "Bryson Stott",
+      "team": "",
+      "avg": 0.256,
+      "obp": 0.334,
+      "slg": 0.401,
+      "ops": 0.735,
+      "hr": 10,
+      "rbi": 67
+    },
+    {
+      "name": "Josh Bell",
+      "team": "",
+      "avg": 0.255,
+      "obp": 0.319,
+      "slg": 0.419,
+      "ops": 0.738,
+      "hr": 21,
+      "rbi": 96
+    },
+    {
+      "name": "Nolan Arenado",
+      "team": "",
+      "avg": 0.255,
+      "obp": 0.331,
+      "slg": 0.475,
+      "ops": 0.806,
+      "hr": 30,
+      "rbi": 86
+    },
+    {
+      "name": "Jackson Merrill",
+      "team": "",
+      "avg": 0.254,
+      "obp": 0.303,
+      "slg": 0.44,
+      "ops": 0.743,
+      "hr": 26,
+      "rbi": 87
+    },
+    {
+      "name": "Brayan Rocchio",
+      "team": "",
+      "avg": 0.253,
+      "obp": 0.313,
+      "slg": 0.391,
+      "ops": 0.704,
+      "hr": 15,
+      "rbi": 73
+    },
+    {
+      "name": "Brooks Lee",
+      "team": "",
+      "avg": 0.253,
+      "obp": 0.3,
+      "slg": 0.428,
+      "ops": 0.728,
+      "hr": 24,
+      "rbi": 83
+    },
+    {
+      "name": "Max Muncy",
+      "team": "",
+      "avg": 0.252,
+      "obp": 0.348,
+      "slg": 0.49,
+      "ops": 0.838,
+      "hr": 29,
+      "rbi": 76
+    },
+    {
+      "name": "Matt Olson",
+      "team": "",
+      "avg": 0.251,
+      "obp": 0.321,
+      "slg": 0.502,
+      "ops": 0.823,
+      "hr": 41,
+      "rbi": 93
+    },
+    {
+      "name": "Jose Altuve",
+      "team": "",
+      "avg": 0.25,
+      "obp": 0.306,
+      "slg": 0.395,
+      "ops": 0.701,
+      "hr": 16,
+      "rbi": 50
+    },
+    {
+      "name": "Miguel Vargas",
+      "team": "",
+      "avg": 0.25,
+      "obp": 0.363,
+      "slg": 0.474,
+      "ops": 0.837,
+      "hr": 33,
+      "rbi": 93
+    },
+    {
+      "name": "Ketel Marte",
+      "team": "",
+      "avg": 0.249,
+      "obp": 0.316,
+      "slg": 0.432,
+      "ops": 0.748,
+      "hr": 22,
+      "rbi": 76
+    },
+    {
+      "name": "George Springer",
+      "team": "",
+      "avg": 0.249,
+      "obp": 0.321,
+      "slg": 0.405,
+      "ops": 0.726,
+      "hr": 15,
+      "rbi": 54
+    },
+    {
+      "name": "Alec Bohm",
+      "team": "",
+      "avg": 0.249,
+      "obp": 0.315,
+      "slg": 0.383,
+      "ops": 0.698,
+      "hr": 15,
+      "rbi": 88
+    },
+    {
+      "name": "Caleb Durbin",
+      "team": "",
+      "avg": 0.248,
+      "obp": 0.332,
+      "slg": 0.378,
+      "ops": 0.71,
+      "hr": 13,
+      "rbi": 64
+    },
+    {
+      "name": "Wilyer Abreu",
+      "team": "",
+      "avg": 0.248,
+      "obp": 0.327,
+      "slg": 0.446,
+      "ops": 0.773,
+      "hr": 24,
+      "rbi": 76
+    },
+    {
+      "name": "Julio Rodr\u00edguez",
+      "team": "",
+      "avg": 0.247,
+      "obp": 0.307,
+      "slg": 0.401,
+      "ops": 0.708,
+      "hr": 22,
+      "rbi": 71
+    },
+    {
+      "name": "Cole Young",
+      "team": "",
+      "avg": 0.246,
+      "obp": 0.312,
+      "slg": 0.381,
+      "ops": 0.693,
+      "hr": 17,
+      "rbi": 66
+    },
+    {
+      "name": "Daylen Lile",
+      "team": "",
+      "avg": 0.246,
+      "obp": 0.296,
+      "slg": 0.429,
+      "ops": 0.725,
+      "hr": 22,
+      "rbi": 89
+    },
+    {
+      "name": "Hunter Goodman",
+      "team": "",
+      "avg": 0.245,
+      "obp": 0.31,
+      "slg": 0.529,
+      "ops": 0.839,
+      "hr": 41,
+      "rbi": 88
+    },
+    {
+      "name": "Travis Bazzana",
+      "team": "",
+      "avg": 0.245,
+      "obp": 0.335,
+      "slg": 0.408,
+      "ops": 0.743,
+      "hr": 15,
+      "rbi": 57
+    },
+    {
+      "name": "Andr\u00e9s Gim\u00e9nez",
+      "team": "",
+      "avg": 0.244,
+      "obp": 0.291,
+      "slg": 0.359,
+      "ops": 0.65,
+      "hr": 9,
+      "rbi": 59
+    },
+    {
+      "name": "Dillon Dingler",
+      "team": "",
+      "avg": 0.243,
+      "obp": 0.302,
+      "slg": 0.446,
+      "ops": 0.748,
+      "hr": 27,
+      "rbi": 91
+    },
+    {
+      "name": "JJ Wetherholt",
+      "team": "",
+      "avg": 0.242,
+      "obp": 0.339,
+      "slg": 0.365,
+      "ops": 0.704,
+      "hr": 17,
+      "rbi": 51
+    },
+    {
+      "name": "Trea Turner",
+      "team": "",
+      "avg": 0.242,
+      "obp": 0.297,
+      "slg": 0.378,
+      "ops": 0.675,
+      "hr": 19,
+      "rbi": 58
+    },
+    {
+      "name": "Mike Trout",
+      "team": "",
+      "avg": 0.242,
+      "obp": 0.382,
+      "slg": 0.421,
+      "ops": 0.803,
+      "hr": 22,
+      "rbi": 54
+    },
+    {
+      "name": "Michael Busch",
+      "team": "",
+      "avg": 0.242,
+      "obp": 0.352,
+      "slg": 0.393,
+      "ops": 0.745,
+      "hr": 20,
+      "rbi": 77
+    },
+    {
+      "name": "Iv\u00e1n Herrera",
+      "team": "",
+      "avg": 0.241,
+      "obp": 0.353,
+      "slg": 0.382,
+      "ops": 0.735,
+      "hr": 19,
+      "rbi": 69
+    },
+    {
+      "name": "Jo Adell",
+      "team": "",
+      "avg": 0.24,
+      "obp": 0.298,
+      "slg": 0.401,
+      "ops": 0.699,
+      "hr": 23,
+      "rbi": 94
+    },
+    {
+      "name": "Kyle Stowers",
+      "team": "",
+      "avg": 0.239,
+      "obp": 0.331,
+      "slg": 0.459,
+      "ops": 0.79,
+      "hr": 21,
+      "rbi": 65
+    },
+    {
+      "name": "Kody Clemens",
+      "team": "",
+      "avg": 0.239,
+      "obp": 0.298,
+      "slg": 0.46,
+      "ops": 0.758,
+      "hr": 27,
+      "rbi": 81
+    },
+    {
+      "name": "Zach Neto",
+      "team": "",
+      "avg": 0.239,
+      "obp": 0.33,
+      "slg": 0.436,
+      "ops": 0.766,
+      "hr": 27,
+      "rbi": 77
+    },
+    {
+      "name": "Carter Jensen",
+      "team": "",
+      "avg": 0.239,
+      "obp": 0.323,
+      "slg": 0.467,
+      "ops": 0.79,
+      "hr": 27,
+      "rbi": 81
+    },
+    {
+      "name": "Corbin Carroll",
+      "team": "",
+      "avg": 0.239,
+      "obp": 0.328,
+      "slg": 0.467,
+      "ops": 0.795,
+      "hr": 22,
+      "rbi": 78
+    },
+    {
+      "name": "Ozzie Albies",
+      "team": "",
+      "avg": 0.237,
+      "obp": 0.293,
+      "slg": 0.392,
+      "ops": 0.685,
+      "hr": 22,
+      "rbi": 73
+    },
+    {
+      "name": "Lawrence Butler",
+      "team": "",
+      "avg": 0.237,
+      "obp": 0.326,
+      "slg": 0.394,
+      "ops": 0.72,
+      "hr": 17,
+      "rbi": 62
+    },
+    {
+      "name": "Jos\u00e9 Ram\u00edrez",
+      "team": "",
+      "avg": 0.235,
+      "obp": 0.32,
+      "slg": 0.368,
+      "ops": 0.688,
+      "hr": 12,
+      "rbi": 53
+    },
+    {
+      "name": "Kyle Tucker",
+      "team": "",
+      "avg": 0.233,
+      "obp": 0.33,
+      "slg": 0.385,
+      "ops": 0.715,
+      "hr": 17,
+      "rbi": 70
+    },
+    {
+      "name": "Kazuma Okamoto",
+      "team": "",
+      "avg": 0.232,
+      "obp": 0.31,
+      "slg": 0.452,
+      "ops": 0.762,
+      "hr": 33,
+      "rbi": 92
+    },
+    {
+      "name": "Kyle Schwarber",
+      "team": "",
+      "avg": 0.232,
+      "obp": 0.354,
+      "slg": 0.503,
+      "ops": 0.857,
+      "hr": 45,
+      "rbi": 97
+    },
+    {
+      "name": "Masyn Winn",
+      "team": "",
+      "avg": 0.232,
+      "obp": 0.308,
+      "slg": 0.317,
+      "ops": 0.625,
+      "hr": 5,
+      "rbi": 56
+    },
+    {
+      "name": "Jazz Chisholm Jr.",
+      "team": "",
+      "avg": 0.231,
+      "obp": 0.312,
+      "slg": 0.399,
+      "ops": 0.711,
+      "hr": 19,
+      "rbi": 55
+    },
+    {
+      "name": "Xander Bogaerts",
+      "team": "",
+      "avg": 0.231,
+      "obp": 0.332,
+      "slg": 0.344,
+      "ops": 0.676,
+      "hr": 13,
+      "rbi": 57
+    },
+    {
+      "name": "Jakob Marsee",
+      "team": "",
+      "avg": 0.231,
+      "obp": 0.348,
+      "slg": 0.359,
+      "ops": 0.707,
+      "hr": 11,
+      "rbi": 41
+    },
+    {
+      "name": "Willy Adames",
+      "team": "",
+      "avg": 0.23,
+      "obp": 0.289,
+      "slg": 0.424,
+      "ops": 0.713,
+      "hr": 21,
+      "rbi": 51
+    },
+    {
+      "name": "Spencer Torkelson",
+      "team": "",
+      "avg": 0.23,
+      "obp": 0.331,
+      "slg": 0.435,
+      "ops": 0.766,
+      "hr": 26,
+      "rbi": 77
+    },
+    {
+      "name": "Salvador Perez",
+      "team": "",
+      "avg": 0.229,
+      "obp": 0.274,
+      "slg": 0.383,
+      "ops": 0.657,
+      "hr": 21,
+      "rbi": 78
+    },
+    {
+      "name": "Jake Burger",
+      "team": "",
+      "avg": 0.228,
+      "obp": 0.302,
+      "slg": 0.421,
+      "ops": 0.723,
+      "hr": 28,
+      "rbi": 90
+    },
+    {
+      "name": "Heriberto Hern\u00e1ndez",
+      "team": "",
+      "avg": 0.228,
+      "obp": 0.313,
+      "slg": 0.442,
+      "ops": 0.755,
+      "hr": 25,
+      "rbi": 67
+    },
+    {
+      "name": "Royce Lewis",
+      "team": "",
+      "avg": 0.227,
+      "obp": 0.287,
+      "slg": 0.38,
+      "ops": 0.667,
+      "hr": 15,
+      "rbi": 57
+    },
+    {
+      "name": "Christian Walker",
+      "team": "",
+      "avg": 0.226,
+      "obp": 0.299,
+      "slg": 0.427,
+      "ops": 0.726,
+      "hr": 29,
+      "rbi": 87
+    },
+    {
+      "name": "Taylor Ward",
+      "team": "",
+      "avg": 0.225,
+      "obp": 0.359,
+      "slg": 0.311,
+      "ops": 0.67,
+      "hr": 7,
+      "rbi": 37
+    },
+    {
+      "name": "Gunnar Henderson",
+      "team": "",
+      "avg": 0.225,
+      "obp": 0.309,
+      "slg": 0.403,
+      "ops": 0.712,
+      "hr": 24,
+      "rbi": 59
+    },
+    {
+      "name": "Daulton Varsho",
+      "team": "",
+      "avg": 0.221,
+      "obp": 0.281,
+      "slg": 0.355,
+      "ops": 0.636,
+      "hr": 12,
+      "rbi": 40
+    },
+    {
+      "name": "Ezequiel Tovar",
+      "team": "",
+      "avg": 0.219,
+      "obp": 0.264,
+      "slg": 0.353,
+      "ops": 0.617,
+      "hr": 13,
+      "rbi": 44
+    },
+    {
+      "name": "Austin Riley",
+      "team": "",
+      "avg": 0.219,
+      "obp": 0.29,
+      "slg": 0.364,
+      "ops": 0.654,
+      "hr": 19,
+      "rbi": 72
+    },
+    {
+      "name": "Ian Happ",
+      "team": "",
+      "avg": 0.218,
+      "obp": 0.326,
+      "slg": 0.412,
+      "ops": 0.738,
+      "hr": 24,
+      "rbi": 68
+    },
+    {
+      "name": "Manny Machado",
+      "team": "",
+      "avg": 0.217,
+      "obp": 0.303,
+      "slg": 0.407,
+      "ops": 0.71,
+      "hr": 30,
+      "rbi": 91
+    },
+    {
+      "name": "JJ Bleday",
+      "team": "",
+      "avg": 0.217,
+      "obp": 0.324,
+      "slg": 0.416,
+      "ops": 0.74,
+      "hr": 24,
+      "rbi": 58
+    },
+    {
+      "name": "Marcus Semien",
+      "team": "",
+      "avg": 0.215,
+      "obp": 0.28,
+      "slg": 0.34,
+      "ops": 0.62,
+      "hr": 15,
+      "rbi": 49
+    },
+    {
+      "name": "Isaac Collins",
+      "team": "",
+      "avg": 0.213,
+      "obp": 0.32,
+      "slg": 0.321,
+      "ops": 0.641,
+      "hr": 6,
+      "rbi": 40
+    },
+    {
+      "name": "Cam Smith",
+      "team": "",
+      "avg": 0.21,
+      "obp": 0.279,
+      "slg": 0.39,
+      "ops": 0.669,
+      "hr": 21,
+      "rbi": 56
+    },
+    {
+      "name": "Munetaka Murakami",
+      "team": "",
+      "avg": 0.207,
+      "obp": 0.347,
+      "slg": 0.478,
+      "ops": 0.825,
+      "hr": 35,
+      "rbi": 77
+    },
+    {
+      "name": "Jarren Duran",
+      "team": "",
+      "avg": 0.207,
+      "obp": 0.266,
+      "slg": 0.361,
+      "ops": 0.627,
+      "hr": 20,
+      "rbi": 69
+    },
+    {
+      "name": "Cedric Mullins",
+      "team": "",
+      "avg": 0.205,
+      "obp": 0.284,
+      "slg": 0.344,
+      "ops": 0.628,
+      "hr": 15,
+      "rbi": 48
+    },
+    {
+      "name": "Colson Montgomery",
+      "team": "",
+      "avg": 0.197,
+      "obp": 0.282,
+      "slg": 0.403,
+      "ops": 0.685,
+      "hr": 31,
+      "rbi": 87
+    },
+    {
+      "name": "Cal Raleigh",
+      "team": "",
+      "avg": 0.182,
+      "obp": 0.296,
+      "slg": 0.368,
+      "ops": 0.664,
+      "hr": 23,
+      "rbi": 69
+    }
+  ],
+  "pitchers": [
+    {
+      "name": "Jacob Misiorowski",
+      "team": "",
+      "era": 1.8,
+      "whip": 0.8,
+      "k9": 12.98,
+      "bb9": 2.27,
+      "wins": 16,
+      "ip": 174.2
+    },
+    {
+      "name": "Cam Schlittler",
+      "team": "",
+      "era": 1.95,
+      "whip": 0.92,
+      "k9": 11.11,
+      "bb9": 2.28,
+      "wins": 14,
+      "ip": 193.2
+    },
+    {
+      "name": "Chris Sale",
+      "team": "",
+      "era": 2.16,
+      "whip": 0.98,
+      "k9": 11.07,
+      "bb9": 1.72,
+      "wins": 14,
+      "ip": 162.2
+    },
+    {
+      "name": "Dylan Cease",
+      "team": "",
+      "era": 2.4,
+      "whip": 1.1,
+      "k9": 12.73,
+      "bb9": 4.15,
+      "wins": 11,
+      "ip": 169.0
+    },
+    {
+      "name": "Yoshinobu Yamamoto",
+      "team": "",
+      "era": 2.53,
+      "whip": 0.87,
+      "k9": 8.85,
+      "bb9": 2.04,
+      "wins": 14,
+      "ip": 185.0
+    },
+    {
+      "name": "Parker Messick",
+      "team": "",
+      "era": 2.56,
+      "whip": 1.06,
+      "k9": 9.32,
+      "bb9": 2.37,
+      "wins": 12,
+      "ip": 186.1
+    },
+    {
+      "name": "Drew Rasmussen",
+      "team": "",
+      "era": 2.67,
+      "whip": 0.91,
+      "k9": 9.1,
+      "bb9": 1.67,
+      "wins": 16,
+      "ip": 172.0
+    },
+    {
+      "name": "Sonny Gray",
+      "team": "",
+      "era": 2.72,
+      "whip": 1.15,
+      "k9": 7.93,
+      "bb9": 2.45,
+      "wins": 18,
+      "ip": 169.0
+    },
+    {
+      "name": "Jes\u00fas Luzardo",
+      "team": "",
+      "era": 2.86,
+      "whip": 1.07,
+      "k9": 11.07,
+      "bb9": 2.6,
+      "wins": 14,
+      "ip": 179.2
+    },
+    {
+      "name": "Eduardo Rodriguez",
+      "team": "",
+      "era": 2.89,
+      "whip": 1.24,
+      "k9": 6.79,
+      "bb9": 2.94,
+      "wins": 16,
+      "ip": 189.2
+    },
+    {
+      "name": "Cristopher S\u00e1nchez",
+      "team": "",
+      "era": 2.91,
+      "whip": 1.2,
+      "k9": 10.04,
+      "bb9": 1.96,
+      "wins": 18,
+      "ip": 207.0
+    },
+    {
+      "name": "Zack Wheeler",
+      "team": "",
+      "era": 3.0,
+      "whip": 1.05,
+      "k9": 10.72,
+      "bb9": 2.61,
+      "wins": 14,
+      "ip": 162.0
+    },
+    {
+      "name": "Cade Cavalli",
+      "team": "",
+      "era": 3.02,
+      "whip": 1.16,
+      "k9": 10.61,
+      "bb9": 2.55,
+      "wins": 13,
+      "ip": 169.2
+    },
+    {
+      "name": "Nick Martinez",
+      "team": "",
+      "era": 3.1,
+      "whip": 1.09,
+      "k9": 5.45,
+      "bb9": 1.3,
+      "wins": 15,
+      "ip": 180.0
+    },
+    {
+      "name": "Nolan McLean",
+      "team": "",
+      "era": 3.16,
+      "whip": 1.17,
+      "k9": 9.72,
+      "bb9": 3.51,
+      "wins": 12,
+      "ip": 179.2
+    },
+    {
+      "name": "Michael King",
+      "team": "",
+      "era": 3.21,
+      "whip": 1.18,
+      "k9": 7.74,
+      "bb9": 3.41,
+      "wins": 12,
+      "ip": 185.0
+    },
+    {
+      "name": "Michael Wacha",
+      "team": "",
+      "era": 3.32,
+      "whip": 1.11,
+      "k9": 7.09,
+      "bb9": 2.42,
+      "wins": 9,
+      "ip": 200.2
+    },
+    {
+      "name": "Sean Burke",
+      "team": "",
+      "era": 3.34,
+      "whip": 1.2,
+      "k9": 9.66,
+      "bb9": 3.24,
+      "wins": 11,
+      "ip": 172.1
+    },
+    {
+      "name": "Reid Detmers",
+      "team": "",
+      "era": 3.36,
+      "whip": 1.04,
+      "k9": 10.26,
+      "bb9": 2.34,
+      "wins": 7,
+      "ip": 185.0
+    },
+    {
+      "name": "Robbie Ray",
+      "team": "",
+      "era": 3.59,
+      "whip": 1.35,
+      "k9": 7.61,
+      "bb9": 4.56,
+      "wins": 13,
+      "ip": 165.2
+    },
+    {
+      "name": "Foster Griffin",
+      "team": "",
+      "era": 3.6,
+      "whip": 1.21,
+      "k9": 8.24,
+      "bb9": 2.35,
+      "wins": 15,
+      "ip": 172.2
+    },
+    {
+      "name": "Braxton Ashcraft",
+      "team": "",
+      "era": 3.65,
+      "whip": 1.09,
+      "k9": 9.42,
+      "bb9": 1.91,
+      "wins": 14,
+      "ip": 165.1
+    },
+    {
+      "name": "Logan Gilbert",
+      "team": "",
+      "era": 3.73,
+      "whip": 1.09,
+      "k9": 9.92,
+      "bb9": 2.37,
+      "wins": 12,
+      "ip": 186.0
+    },
+    {
+      "name": "Taj Bradley",
+      "team": "",
+      "era": 3.73,
+      "whip": 1.22,
+      "k9": 10.35,
+      "bb9": 3.84,
+      "wins": 12,
+      "ip": 178.1
+    },
+    {
+      "name": "Gavin Williams",
+      "team": "",
+      "era": 3.76,
+      "whip": 1.11,
+      "k9": 12.11,
+      "bb9": 2.98,
+      "wins": 14,
+      "ip": 184.1
+    },
+    {
+      "name": "Shota Imanaga",
+      "team": "",
+      "era": 3.77,
+      "whip": 1.1,
+      "k9": 8.98,
+      "bb9": 1.91,
+      "wins": 11,
+      "ip": 174.1
+    },
+    {
+      "name": "Paul Skenes",
+      "team": "",
+      "era": 3.82,
+      "whip": 1.12,
+      "k9": 10.33,
+      "bb9": 2.53,
+      "wins": 10,
+      "ip": 174.1
+    },
+    {
+      "name": "Andre Pallante",
+      "team": "",
+      "era": 3.83,
+      "whip": 1.27,
+      "k9": 6.11,
+      "bb9": 2.78,
+      "wins": 12,
+      "ip": 162.0
+    },
+    {
+      "name": "Sandy Alcantara",
+      "team": "",
+      "era": 3.87,
+      "whip": 1.23,
+      "k9": 6.43,
+      "bb9": 2.48,
+      "wins": 13,
+      "ip": 214.0
+    },
+    {
+      "name": "Jos\u00e9 Soriano",
+      "team": "",
+      "era": 3.91,
+      "whip": 1.29,
+      "k9": 8.58,
+      "bb9": 3.7,
+      "wins": 12,
+      "ip": 177.1
+    },
+    {
+      "name": "Michael McGreevy",
+      "team": "",
+      "era": 3.95,
+      "whip": 1.28,
+      "k9": 6.14,
+      "bb9": 2.56,
+      "wins": 7,
+      "ip": 168.2
+    },
+    {
+      "name": "Bryan Woo",
+      "team": "",
+      "era": 4.01,
+      "whip": 1.1,
+      "k9": 9.1,
+      "bb9": 2.03,
+      "wins": 12,
+      "ip": 173.0
+    },
+    {
+      "name": "Trevor Rogers",
+      "team": "",
+      "era": 4.03,
+      "whip": 1.18,
+      "k9": 8.33,
+      "bb9": 2.07,
+      "wins": 10,
+      "ip": 169.2
+    },
+    {
+      "name": "Framber Valdez",
+      "team": "",
+      "era": 4.03,
+      "whip": 1.36,
+      "k9": 6.98,
+      "bb9": 3.47,
+      "wins": 10,
+      "ip": 174.0
+    },
+    {
+      "name": "Shane Baz",
+      "team": "",
+      "era": 4.11,
+      "whip": 1.35,
+      "k9": 7.71,
+      "bb9": 3.16,
+      "wins": 6,
+      "ip": 179.2
+    },
+    {
+      "name": "Noah Cameron",
+      "team": "",
+      "era": 4.11,
+      "whip": 1.23,
+      "k9": 8.02,
+      "bb9": 2.94,
+      "wins": 9,
+      "ip": 177.1
+    },
+    {
+      "name": "Jacob deGrom",
+      "team": "",
+      "era": 4.2,
+      "whip": 1.14,
+      "k9": 11.12,
+      "bb9": 2.55,
+      "wins": 11,
+      "ip": 162.2
+    },
+    {
+      "name": "George Kirby",
+      "team": "",
+      "era": 4.33,
+      "whip": 1.4,
+      "k9": 7.63,
+      "bb9": 2.42,
+      "wins": 9,
+      "ip": 174.2
+    },
+    {
+      "name": "Tanner Bibee",
+      "team": "",
+      "era": 4.36,
+      "whip": 1.22,
+      "k9": 7.09,
+      "bb9": 2.63,
+      "wins": 7,
+      "ip": 188.0
+    },
+    {
+      "name": "Freddy Peralta",
+      "team": "",
+      "era": 4.42,
+      "whip": 1.33,
+      "k9": 8.31,
+      "bb9": 3.36,
+      "wins": 10,
+      "ip": 169.0
+    },
+    {
+      "name": "Kevin Gausman",
+      "team": "",
+      "era": 4.51,
+      "whip": 1.27,
+      "k9": 9.32,
+      "bb9": 2.38,
+      "wins": 9,
+      "ip": 177.2
+    },
+    {
+      "name": "MacKenzie Gore",
+      "team": "",
+      "era": 4.58,
+      "whip": 1.34,
+      "k9": 9.05,
+      "bb9": 3.69,
+      "wins": 8,
+      "ip": 173.0
+    },
+    {
+      "name": "Andrew Abbott",
+      "team": "",
+      "era": 4.61,
+      "whip": 1.45,
+      "k9": 7.1,
+      "bb9": 4.12,
+      "wins": 6,
+      "ip": 166.0
+    },
+    {
+      "name": "Aaron Nola",
+      "team": "",
+      "era": 4.67,
+      "whip": 1.35,
+      "k9": 9.09,
+      "bb9": 3.03,
+      "wins": 7,
+      "ip": 175.1
+    },
+    {
+      "name": "Merrill Kelly",
+      "team": "",
+      "era": 4.94,
+      "whip": 1.46,
+      "k9": 6.28,
+      "bb9": 3.89,
+      "wins": 10,
+      "ip": 162.0
+    },
+    {
+      "name": "Seth Lugo",
+      "team": "",
+      "era": 5.17,
+      "whip": 1.47,
+      "k9": 7.0,
+      "bb9": 2.82,
+      "wins": 7,
+      "ip": 172.1
+    }
+  ],
+  "injuries": [],
   "_counts": {
-    "games": 2,
-    "props": 60,
-    "batters": 0,
-    "pitchers": 0,
-    "elite": 0,
+    "games": 1,
+    "props": 54,
+    "batters": 135,
+    "pitchers": 46,
+    "injuries": 0,
+    "elite": 18,
     "strong": 0
   }
 }
