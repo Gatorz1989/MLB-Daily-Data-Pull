@@ -991,14 +991,6 @@ textarea.script-box:focus{border-color:var(--gold);}
       </div>
       <div class="sep"></div>
       <div class="sec-hdr">⚾ MLB Data Sources</div>
-      <div class="form-row">
-        <label>BigBall API Key</label>
-        <input type="password" id="dc-bigball-key" placeholder="Enter BigBall Sports Data key..." autocomplete="off">
-        <button class="toggle-pw" onclick="togglePw('dc-bigball-key')">👁</button>
-        <button class="btn btn-outline btn-sm" onclick="dcTestBigBall()">Test</button>
-        <button class="btn btn-primary btn-sm" onclick="dcSaveBigBall()">Save</button>
-      </div>
-      <div id="bigball-status" class="status-box"></div>
       <div style="margin-top:8px;padding:8px 12px;background:var(--bg3);border-radius:6px;border:1px solid var(--border);font-size:11px;color:var(--text2);">
         ℹ️ <strong style="color:var(--text);">MLB Stats API</strong> and <strong style="color:var(--text);">Baseball Savant</strong> are fetched directly — no key required.
       </div>
@@ -1582,7 +1574,7 @@ function populateTeamSelectors() {
 // ── LOAD SAVED KEYS ────────────────────────────────────────────────
 function loadSavedKeys() {
   var fields = {
-    'dc-odds-key':'mlb_odds_key','dc-bigball-key':'mlb_bigball_key',
+    'dc-odds-key':'mlb_odds_key',
     'dc-heygen-key':'mlb_heygen_key','dc-heygen-avatar':'mlb_heygen_avatar',
     'dc-heygen-voice':'mlb_heygen_voice','dc-heygen-intro':'mlb_heygen_intro',
     'dc-heygen-short':'mlb_heygen_short','dc-discord-webhook':'mlb_discord_webhook',
@@ -1626,21 +1618,6 @@ function dcTestOdds(){
       if(r.ok){showStatus('odds-status','✅ Odds API key valid.','ok');safeSave('mlb_odds_key',k);document.getElementById('chip-odds').className='hdr-chip chip-ok';document.getElementById('chip-odds').textContent='ODDS ✓';}
       else r.text().then(function(t){showStatus('odds-status','❌ Error '+r.status+': '+t.substring(0,120),'err');});
     }).catch(function(e){showStatus('odds-status','❌ Network error: '+e.message,'err');});
-}
-function dcSaveBigBall(){var k=(document.getElementById('dc-bigball-key').value||'').trim();safeSave('mlb_bigball_key',k);showStatus('bigball-status',k?'✅ BigBall key saved.':'Key cleared.',k?'ok':'warn');}
-function dcTestBigBall(){
-  var k=(document.getElementById('dc-bigball-key').value||safeLoad('mlb_bigball_key')).trim();
-  if(!k){showStatus('bigball-status','⚠️ Enter BigBallsData key first.','warn');return;}
-  showStatus('bigball-status','⏳ Testing BigBallsData…','info');
-  fetch('https://api.bigballsdata.com/v1/injuries?sport=baseball', {
-    headers:{'Authorization':'Bearer '+k,'x-api-key':k}
-  })
-    .then(function(r){
-      if(r.ok){showStatus('bigball-status','✅ BigBallsData key valid — injuries endpoint confirmed.','ok');safeSave('mlb_bigball_key',k);}
-      else if(r.status===401){showStatus('bigball-status','❌ 401 — key rejected. Regenerate on your BigBallsData dashboard.','err');}
-      else{showStatus('bigball-status','⚠️ HTTP '+r.status+' — key saved. Run mlb_edge_data_pull.py to verify full access.','warn');safeSave('mlb_bigball_key',k);}
-    })
-    .catch(function(e){showStatus('bigball-status','⚠️ CORS block (browser limitation) — key saved. Injuries will pull via mlb_edge_data_pull.py.','warn');safeSave('mlb_bigball_key',k);});
 }
 function dcSaveHeyGen(){var k=(document.getElementById('dc-heygen-key').value||'').trim();safeSave('mlb_heygen_key',k);showStatus('heygen-status',k?'✅ HeyGen key saved.':'Key cleared.',k?'ok':'warn');}
 function dcSaveHeyGenMeta(){
@@ -1699,7 +1676,6 @@ function dcTestAllKeys(){
   showStatus('all-keys-status','⏳ Checking all keys…','info');
   var keys=[
     {name:'Odds API',val:safeLoad('mlb_odds_key')},
-    {name:'BigBall',val:safeLoad('mlb_bigball_key')},
     {name:'HeyGen',val:safeLoad('mlb_heygen_key')},
     {name:'Discord',val:safeLoad('mlb_discord_webhook')},
     {name:'GitHub PAT',val:safeLoad('mlb_github_pat')},

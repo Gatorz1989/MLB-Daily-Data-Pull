@@ -29,7 +29,7 @@ Required env vars
   ODDS_API_KEY      Your Odds API key (https://the-odds-api.com)
 
 Optional env vars
-  BIGBALL_API_KEY   BigBallsData API key (bigballsdata.com)
+  (no additional keys required — MLB Stats API is free)
   ODDS_REGION       us | uk | au | eu  (default: us)
   ODDS_BOOKS        Comma-separated bookmakers  (default: draftkings,fanduel,betmgm,bet365_us)
   EDGE_MIN_PCT      Minimum edge % to include in output  (default: 0)
@@ -61,7 +61,6 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════════════
 
 ODDS_API_BASE  = "https://api.the-odds-api.com/v4"
-BIGBALL_BASE   = "https://api.bigballsdata.com/v1"
 MLB_STATS_BASE = "https://statsapi.mlb.com/api/v1"   # free, no key required
 
 SPORT          = "baseball_mlb"
@@ -498,41 +497,36 @@ def _fetch_mlb_pitching(season: str) -> list[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# BIGBALLSDATA  — INJURIES
+# MLB STATS API  — INJURIES  (free, no key required)
 # ═══════════════════════════════════════════════════════════════════════════
 
-def fetch_bigball_injuries(api_key: str) -> list[dict]:
+def fetch_mlb_injuries() -> list[dict]:
     """
-    Pull current MLB injury list from BigBallsData.
-    Returns list of {player, team, status, description} dicts.
-    Falls back to empty list if key not set or API unavailable.
+    Pull current MLB injury report from statsapi.mlb.com.
+    Free, no API key required. Returns list of {player, team, status, description}.
     """
-    if not api_key:
-        log.info("BigBallsData key not set — skipping injury pull.")
-        return []
-    url     = f"{BIGBALL_BASE}/injuries"
-    headers = {"Authorization": f"Bearer {api_key}", "x-api-key": api_key}
-    params  = {"sport": "baseball"}
+    url    = f"{MLB_STATS_BASE}/injuries"
+    params = {"sportId": 1}
     try:
-        log.info("Fetching MLB injuries from BigBallsData …")
-        resp = requests.get(url, headers=headers, params=params, timeout=20)
+        log.info("Fetching MLB injuries from statsapi.mlb.com …")
+        resp = requests.get(url, params=params, timeout=20)
         resp.raise_for_status()
         raw      = resp.json()
-        injuries = raw if isinstance(raw, list) else raw.get("data", raw.get("injuries", []))
+        injuries = raw if isinstance(raw, list) else raw.get("injuries", [])
         result   = []
         for inj in injuries:
-            player = (inj.get("player_name") or inj.get("name")
-                      or (inj.get("player") or {}).get("name", ""))
+            player = inj.get("player", {})
+            team   = inj.get("team", {})
             result.append({
-                "player":      player,
-                "team":        inj.get("team") or inj.get("team_name", ""),
-                "status":      inj.get("status") or inj.get("injury_status", ""),
-                "description": inj.get("description") or inj.get("injury_type") or inj.get("notes", ""),
+                "player":      player.get("fullName", inj.get("player_name", "")),
+                "team":        team.get("abbreviation", inj.get("team_name", "")),
+                "status":      inj.get("status", ""),
+                "description": inj.get("notes", inj.get("description", "")),
             })
         log.info(f"  {len(result)} injuries loaded")
         return result
     except Exception as e:
-        log.warning(f"BigBallsData injuries failed: {e}")
+        log.warning(f"MLB injuries failed: {e}")
         return []
 
 
@@ -716,8 +710,7 @@ def main() -> None:
     setup_logging(args.verbose)
 
     # ── API keys ────────────────────────────────────────────────────────
-    odds_key    = get_env("ODDS_API_KEY")
-    bigball_key = get_env("BIGBALL_API_KEY")
+    odds_key = get_env("ODDS_API_KEY")
 
     if not odds_key:
         log.error("ODDS_API_KEY not set. Add it to .env or export it as an env var.")
@@ -750,8 +743,8 @@ def main() -> None:
         season = str(datetime.now().year)
         batters, pitchers = fetch_mlb_stats(season)
 
-    # ── Step 3b: Injuries (BigBallsData) ───────────────────────────────
-    injuries: list[dict] = fetch_bigball_injuries(bigball_key)
+    # ── Step 3b: Injuries (MLB Stats API — free, no key) ───────────────
+    injuries: list[dict] = fetch_mlb_injuries()
 
     # ── Step 4: Enrich props with projections / edge calc ───────────────
     if props and (batters or pitchers):
