@@ -1247,6 +1247,56 @@ textarea.script-box:focus{border-color:var(--gold);}
     </div>
   </div>
 
+  <!-- STEP 6: Card Builder (LIVE) -->
+  <div class="export-step">
+    <div class="export-step-hdr">
+      <div class="step-num">6</div><h4>Build Social Cards</h4>
+      <span class="hdr-chip chip-ok" style="margin-left:auto;font-size:9px;">LIVE</span>
+    </div>
+    <div class="export-step-body">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
+        Generate branded <strong style="color:var(--text);">16:9 (1920×1080)</strong> YouTube/Twitter and
+        <strong style="color:var(--text);">9:16 (1080×1920)</strong> Instagram/TikTok/Stories cards from your
+        locked pick — no local files needed. Download as PNG for post-production.
+      </p>
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-outline btn-sm" onclick="cardAutoFill()">⚡ Auto-Fill from Locked Pick</button>
+        <span style="font-size:11px;color:var(--text3);margin-left:8px;" id="card-autofill-status"></span>
+      </div>
+      <div class="form-row"><label>Player Name</label><input type="text" id="card-player" placeholder="e.g. Shohei Ohtani"></div>
+      <div class="form-row"><label>Prop Line</label><input type="text" id="card-prop" placeholder="e.g. Strikeouts Over/Under 6.5"></div>
+      <div class="form-row"><label>Projected</label><input type="text" id="card-projected" placeholder="e.g. 7.2"></div>
+      <div class="form-row"><label>Hit Rate</label><input type="text" id="card-hitrate" placeholder="e.g. 68%"></div>
+      <div class="form-row"><label>Edge</label><input type="text" id="card-edge" placeholder="e.g. +12.4%"></div>
+      <div class="form-row"><label>Model Confidence</label><input type="text" id="card-confidence" placeholder="e.g. HIGH / ELITE / ★★★★★"></div>
+      <div class="form-row"><label>Matchup</label><input type="text" id="card-matchup" placeholder="e.g. LAD vs NYM — 7:10 PM ET"></div>
+      <div class="sep"></div>
+      <div class="sec-hdr">📸 Images (optional — paste public image URLs)</div>
+      <div class="form-row"><label>Player Photo URL</label><input type="text" id="card-photo-url" placeholder="https://... (MLB headshot or action shot)"></div>
+      <div class="form-row"><label>Team Logo URL</label><input type="text" id="card-logo-url" placeholder="https://... (team logo PNG)"></div>
+      <div class="sep"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn btn-primary" onclick="generateCard16x9()">🖼️ Generate 16:9 (1920×1080)</button>
+        <button class="btn btn-primary" onclick="generateCard9x16()">📱 Generate 9:16 (1080×1920)</button>
+      </div>
+      <!-- 16:9 preview -->
+      <div id="card-16x9-wrap" style="display:none;margin-bottom:20px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600;letter-spacing:0.4px;">16:9 PREVIEW — LANDSCAPE (YouTube / Twitter)</div>
+        <canvas id="card-preview-16x9" style="width:100%;max-width:640px;height:auto;border:1px solid var(--border);border-radius:6px;display:block;"></canvas>
+        <button class="btn btn-green btn-sm" onclick="downloadCard('card-canvas-16x9','edge_card_16x9.png')" style="margin-top:8px;">⬇️ Download 1920×1080 PNG</button>
+        <canvas id="card-canvas-16x9" style="display:none;"></canvas>
+      </div>
+      <!-- 9:16 preview -->
+      <div id="card-9x16-wrap" style="display:none;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600;letter-spacing:0.4px;">9:16 PREVIEW — PORTRAIT (Instagram / TikTok / Stories)</div>
+        <canvas id="card-preview-9x16" style="width:280px;height:auto;border:1px solid var(--border);border-radius:6px;display:block;"></canvas>
+        <button class="btn btn-green btn-sm" onclick="downloadCard('card-canvas-9x16','edge_card_9x16.png')" style="margin-top:8px;">⬇️ Download 1080×1920 PNG</button>
+        <canvas id="card-canvas-9x16" style="display:none;"></canvas>
+      </div>
+      <div id="card-status" class="status-box"></div>
+    </div>
+  </div>
+
   <!-- AFFILIATES -->
   <div class="card">
     <div class="card-hdr"><span>🤝</span><h3>Affiliate Programs</h3></div>
@@ -3507,6 +3557,482 @@ function labPreviewWeightImpact() {
         '<span style="font-size:11px;color:var(--gold);width:50px;text-align:right;">'+(p.edge>=0?'+':'')+p.edge+'%</span>'+
         '<span style="font-size:11px;color:'+dClr+';width:50px;text-align:right;">'+dStr+'</span></div>';
     }).join('');
+}
+
+/* ============================================================
+   STEP 6 — SOCIAL CARD BUILDER (canvas-based, no local files)
+   ============================================================ */
+
+function cardAutoFill() {
+  var statusEl = document.getElementById('card-autofill-status');
+  var filled = false;
+  // Try PICKS_DATA first (richest source)
+  if (typeof PICKS_DATA !== 'undefined' && PICKS_DATA.length > 0) {
+    var top = PICKS_DATA.slice().sort(function(a,b){ return (b.edge||0)-(a.edge||0); })[0];
+    if (top) {
+      var set = function(id, val){ var el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=String(val); };
+      set('card-player', top.player || '');
+      var pLine = (top.propType||'') + (top.line ? ' ' + top.line : '') + (top.direction ? ' (' + top.direction + ')' : '');
+      set('card-prop', pLine.trim());
+      set('card-projected', top.projected || top.projection || '');
+      set('card-hitrate', top.hitRate ? (top.hitRate + (String(top.hitRate).includes('%')?'':'%')) : '');
+      set('card-edge', top.edge !== undefined ? (top.edge >= 0 ? '+' : '') + top.edge + '%' : '');
+      set('card-confidence', top.tier || top.grade || 'HIGH');
+      if (top.team && top.opponent) set('card-matchup', top.team + ' vs ' + top.opponent + (top.gameTime ? ' — ' + top.gameTime : ''));
+      if (statusEl) statusEl.textContent = '✓ Filled from top pick: ' + top.player;
+      filled = true;
+    }
+  }
+  // Fallback: locked sharp pick display
+  if (!filled) {
+    var nameEl = document.getElementById('exp-sharp-name');
+    var detEl  = document.getElementById('exp-sharp-detail');
+    if (nameEl && nameEl.textContent.trim()) {
+      document.getElementById('card-player').value = nameEl.textContent.trim();
+      if (detEl) document.getElementById('card-prop').value = detEl.textContent.trim();
+      if (statusEl) statusEl.textContent = '✓ Filled from locked pick';
+      filled = true;
+    }
+  }
+  if (!filled && statusEl) statusEl.textContent = '⚠ No data loaded — fill fields manually';
+}
+
+/* ── Canvas helpers ───────────────────────────────────────── */
+
+async function _cardLoadImage(url) {
+  if (!url || !url.trim()) return null;
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload  = function() { resolve(img); };
+    img.onerror = function() { resolve(null); };
+    setTimeout(function() { if (!img.complete) resolve(null); }, 6000);
+    img.src = url.trim();
+  });
+}
+
+function _roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+function _cornerBrackets(ctx, W, H, size, thick, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth   = thick;
+  ctx.lineCap     = 'square';
+  var p = 22;
+  // TL
+  ctx.beginPath(); ctx.moveTo(p, p+size); ctx.lineTo(p, p); ctx.lineTo(p+size, p); ctx.stroke();
+  // TR
+  ctx.beginPath(); ctx.moveTo(W-p-size, p); ctx.lineTo(W-p, p); ctx.lineTo(W-p, p+size); ctx.stroke();
+  // BL
+  ctx.beginPath(); ctx.moveTo(p, H-p-size); ctx.lineTo(p, H-p); ctx.lineTo(p+size, H-p); ctx.stroke();
+  // BR
+  ctx.beginPath(); ctx.moveTo(W-p-size, H-p); ctx.lineTo(W-p, H-p); ctx.lineTo(W-p, H-p-size); ctx.stroke();
+  ctx.restore();
+}
+
+function _pickBanner(ctx, x, y, w, h, label) {
+  var g = ctx.createLinearGradient(x, y, x+w, y);
+  g.addColorStop(0,   'rgba(22,82,140,0.92)');
+  g.addColorStop(0.5, 'rgba(41,121,200,0.96)');
+  g.addColorStop(1,   'rgba(22,82,140,0.92)');
+  ctx.fillStyle = g;
+  ctx.fillRect(x, y, w, h);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(201,162,39,0.55)';
+  ctx.lineWidth   = 1.5;
+  ctx.strokeRect(x+0.75, y+0.75, w-1.5, h-1.5);
+  ctx.font        = 'bold ' + Math.round(h*0.38) + 'px Arial,Helvetica,sans-serif';
+  ctx.fillStyle   = '#ffffff';
+  ctx.textAlign   = 'center';
+  ctx.fillText(label, x+w/2, y+h*0.68);
+  ctx.restore();
+}
+
+function _playerCircle(ctx, cx, cy, radius, img) {
+  // Outer glow
+  var glow = ctx.createRadialGradient(cx, cy, radius*0.7, cx, cy, radius+24);
+  glow.addColorStop(0, 'rgba(41,121,200,0.25)');
+  glow.addColorStop(1, 'rgba(41,121,200,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(cx, cy, radius+24, 0, Math.PI*2); ctx.fill();
+  // Gold ring
+  ctx.save();
+  ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, cy, radius+5, 0, Math.PI*2); ctx.stroke();
+  // Blue ring
+  ctx.strokeStyle = '#2979c8'; ctx.lineWidth = 7;
+  ctx.beginPath(); ctx.arc(cx, cy, radius+1, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+  // Clip fill
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
+  if (img) {
+    var ar = img.width / img.height;
+    var dw, dh;
+    if (ar > 1) { dh = radius*2; dw = dh*ar; } else { dw = radius*2; dh = dw/ar; }
+    ctx.drawImage(img, cx-dw/2, cy-dh/2, dw, dh);
+  } else {
+    var bg = ctx.createLinearGradient(cx-radius, cy-radius, cx+radius, cy+radius);
+    bg.addColorStop(0, '#0d1f3c'); bg.addColorStop(1, '#162a50');
+    ctx.fillStyle = bg; ctx.fillRect(cx-radius, cy-radius, radius*2, radius*2);
+    ctx.font = Math.round(radius*0.55)+'px Arial'; ctx.fillStyle = 'rgba(41,121,200,0.28)';
+    ctx.textAlign = 'center'; ctx.fillText('⚾', cx, cy + radius*0.20);
+  }
+  ctx.restore();
+}
+
+function _logoCircle(ctx, cx, cy, radius, img) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, radius+4, 0, Math.PI*2);
+  ctx.fillStyle = '#030a12'; ctx.fill();
+  ctx.strokeStyle = '#c9a227'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(cx, cy, radius+3, 0, Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
+  if (img) {
+    ctx.drawImage(img, cx-radius, cy-radius, radius*2, radius*2);
+  } else {
+    var bg2 = ctx.createLinearGradient(cx-radius, cy-radius, cx+radius, cy+radius);
+    bg2.addColorStop(0, '#0f1d36'); bg2.addColorStop(1, '#1e2d4a');
+    ctx.fillStyle = bg2; ctx.fillRect(cx-radius, cy-radius, radius*2, radius*2);
+    ctx.font = Math.round(radius*0.65)+'px Arial'; ctx.fillStyle = 'rgba(201,162,39,0.45)';
+    ctx.textAlign = 'center'; ctx.fillText('⚾', cx, cy + radius*0.22);
+  }
+  ctx.restore();
+}
+
+function _nameBox(ctx, x, y, w, h, playerName, propText, fs1, fs2) {
+  var g = ctx.createLinearGradient(x, y, x+w, y);
+  g.addColorStop(0,   'rgba(22,82,140,0.88)');
+  g.addColorStop(0.5, 'rgba(41,121,200,0.93)');
+  g.addColorStop(1,   'rgba(22,82,140,0.88)');
+  _roundRect(ctx, x, y, w, h, 8);
+  ctx.fillStyle = g; ctx.fill();
+  ctx.save();
+  ctx.strokeStyle = 'rgba(201,162,39,0.5)'; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.font = 'bold '+fs1+'px Arial,Helvetica,sans-serif'; ctx.fillStyle = '#ffffff';
+  ctx.fillText((playerName||'PLAYER NAME').toUpperCase(), x+w/2, y+h*0.48);
+  ctx.font = fs2+'px Arial,Helvetica,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.78)';
+  ctx.fillText((propText||'PROP LINE').toUpperCase(), x+w/2, y+h*0.80);
+  ctx.restore();
+}
+
+function _statBox(ctx, x, y, w, h, label, value, fsLabel, fsValue) {
+  var bg = ctx.createLinearGradient(x, y, x, y+h);
+  bg.addColorStop(0, 'rgba(12,18,34,0.97)'); bg.addColorStop(1, 'rgba(8,12,22,0.97)');
+  _roundRect(ctx, x, y, w, h, 7);
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.save();
+  ctx.strokeStyle = 'rgba(41,121,200,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+  // Top accent bar
+  ctx.fillStyle = '#2979c8'; ctx.fillRect(x+7, y+4, w-14, 4);
+  ctx.textAlign = 'center';
+  ctx.font = 'bold '+fsLabel+'px Arial,Helvetica,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText((label||'').toUpperCase(), x+w/2, y+h*0.40);
+  ctx.font = 'bold '+fsValue+'px Arial,Helvetica,sans-serif';
+  ctx.fillStyle = '#c9a227';
+  ctx.fillText(value||'—', x+w/2, y+h*0.82);
+  ctx.restore();
+}
+
+function _vsBanner(ctx, x, y, w, h, text, fs) {
+  var g = ctx.createLinearGradient(x, y, x+w, y);
+  g.addColorStop(0,   'rgba(8,14,26,0.92)');
+  g.addColorStop(0.5, 'rgba(20,38,72,0.96)');
+  g.addColorStop(1,   'rgba(8,14,26,0.92)');
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(41,121,200,0.28)'; ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, w, h);
+  ctx.font = fs+'px Arial,Helvetica,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.72)';
+  ctx.textAlign = 'center';
+  ctx.fillText((text||'TEAM A vs TEAM B').toUpperCase(), x+w/2, y+h/2+fs*0.36);
+  ctx.restore();
+}
+
+function _bottomStats(ctx, x, y, w, h, stats, fsLabel, fsValue) {
+  ctx.fillStyle = '#060c1a'; ctx.fillRect(x, y, w, h);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(41,121,200,0.2)'; ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, w, h);
+  var colW = w / stats.length;
+  stats.forEach(function(s, i) {
+    var cx2 = x + colW*i + colW/2;
+    if (i>0) {
+      ctx.beginPath(); ctx.moveTo(x+colW*i, y+10); ctx.lineTo(x+colW*i, y+h-10); ctx.stroke();
+    }
+    ctx.textAlign = 'center';
+    ctx.font = 'bold '+fsLabel+'px Arial'; ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.fillText((s.label||'').toUpperCase(), cx2, y+h*0.30);
+    ctx.font = 'bold '+fsValue+'px Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(s.value||'—', cx2, y+h*0.72);
+  });
+  ctx.restore();
+}
+
+function _footer(ctx, x, y, w, h, fs) {
+  ctx.fillStyle = '#030711'; ctx.fillRect(x, y, w, h);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(201,162,39,0.28)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+w, y); ctx.stroke();
+  ctx.font = fs+'px Arial,Helvetica,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.32)';
+  ctx.textAlign = 'center';
+  ctx.fillText('EDGE ANALYSIS  |  DATA DRIVEN ADVANTAGE  |  BEAT THE BOOKS. WIN MORE.', x+w/2, y+h/2+fs*0.38);
+  ctx.restore();
+}
+
+function _bgGrid(ctx, W, H, spacing, color) {
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 1;
+  for (var gx=0; gx<W; gx+=spacing) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+  for (var gy=0; gy<H; gy+=spacing) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+  ctx.restore();
+}
+
+/* ── 9:16 card (1080 × 1920) ─────────────────────────────── */
+
+async function generateCard9x16() {
+  var statusEl = document.getElementById('card-status');
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--text3);">⏳ Generating 9:16 card…</span>';
+
+  var W = 1080, H = 1920;
+  var canvas  = document.getElementById('card-canvas-9x16');
+  var preview = document.getElementById('card-preview-9x16');
+  canvas.width = W; canvas.height = H;
+
+  var player  = document.getElementById('card-player').value.trim()     || 'PLAYER NAME';
+  var prop    = document.getElementById('card-prop').value.trim()        || 'PROP LINE';
+  var proj    = document.getElementById('card-projected').value.trim()   || '—';
+  var hr      = document.getElementById('card-hitrate').value.trim()     || '—';
+  var edgeVal = document.getElementById('card-edge').value.trim()        || '—';
+  var conf    = document.getElementById('card-confidence').value.trim()  || 'HIGH';
+  var matchup = document.getElementById('card-matchup').value.trim()     || 'TEAM A vs TEAM B';
+
+  var playerImg = await _cardLoadImage(document.getElementById('card-photo-url').value);
+  var logoImg   = await _cardLoadImage(document.getElementById('card-logo-url').value);
+
+  var ctx = canvas.getContext('2d');
+
+  // Background
+  var bgG = ctx.createLinearGradient(0, 0, 0, H);
+  bgG.addColorStop(0,   '#020810'); bgG.addColorStop(0.5, '#050d1c'); bgG.addColorStop(1, '#020810');
+  ctx.fillStyle = bgG; ctx.fillRect(0, 0, W, H);
+  _bgGrid(ctx, W, H, 45, 'rgba(41,121,200,0.045)');
+
+  // Corner brackets
+  _cornerBrackets(ctx, W, H, 88, 5, '#c9a227');
+
+  // Logo
+  var logoAreaY = 105;
+  ctx.save();
+  ctx.font = 'bold 46px Arial,Helvetica,sans-serif'; ctx.fillStyle = '#c9a227'; ctx.textAlign = 'center';
+  ctx.fillText('THE EDGE REPORT', W/2, logoAreaY);
+  ctx.font = '18px Arial,Helvetica,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.52)';
+  ctx.fillText('WHERE THE DATA BEATS VEGAS', W/2, logoAreaY+34);
+  ctx.strokeStyle = 'rgba(201,162,39,0.3)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W/2-210, logoAreaY+48); ctx.lineTo(W/2+210, logoAreaY+48); ctx.stroke();
+  ctx.restore();
+
+  // Sport icons
+  var icY = logoAreaY + 88;
+  var icons9 = ['⚾','🏈','🏀','🏒','⚽'];
+  var iSpacing = 74, iStartX = W/2 - (icons9.length-1)*iSpacing/2;
+  icons9.forEach(function(ic,i){
+    ctx.save(); ctx.globalAlpha = i===0?1.0:0.22;
+    ctx.font = '28px Arial'; ctx.textAlign = 'center';
+    ctx.fillText(ic, iStartX+i*iSpacing, icY); ctx.restore();
+  });
+
+  // Pick banner
+  var bY = icY + 46;
+  _pickBanner(ctx, 44, bY, W-88, 64, 'MLB PROP PICK');
+
+  // Player photo circle
+  var photoR = 286, photoCX = W/2, photoCY = bY + 64 + 60 + photoR;
+  _playerCircle(ctx, photoCX, photoCY, photoR, playerImg);
+
+  // Team logo (bottom-right of photo circle)
+  _logoCircle(ctx, photoCX+photoR-28, photoCY+photoR-28, 92, logoImg);
+
+  // Name box
+  var nBoxY = photoCY + photoR + 38;
+  _nameBox(ctx, 44, nBoxY, W-88, 100, player, prop, 30, 16);
+
+  // 3 stat boxes
+  var sBoxY = nBoxY + 100 + 26;
+  var sBoxW = (W-88-20)/3, sBoxH = 118;
+  [
+    {label:'PROJECTED', value:proj},
+    {label:'HIT RATE',  value:hr},
+    {label:'EDGE',      value:edgeVal}
+  ].forEach(function(s,i){
+    _statBox(ctx, 44+i*(sBoxW+10), sBoxY, sBoxW, sBoxH, s.label, s.value, 13, 34);
+  });
+
+  // VS banner
+  var vsY = sBoxY + sBoxH + 26;
+  _vsBanner(ctx, 0, vsY, W, 58, matchup, 17);
+
+  // Bottom 4 stats
+  var btY = vsY + 58;
+  _bottomStats(ctx, 0, btY, W, 100, [
+    {label:'MODEL CONF.', value:conf},
+    {label:'PROJECTED',   value:proj},
+    {label:'LINE MOVE',   value:'→'},
+    {label:'OUR EDGE',    value:edgeVal}
+  ], 11, 22);
+
+  // Footer
+  _footer(ctx, 0, H-58, W, 58, 12);
+
+  // Copy to preview
+  preview.width = W; preview.height = H;
+  preview.getContext('2d').drawImage(canvas, 0, 0);
+  document.getElementById('card-9x16-wrap').style.display = 'block';
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--green);">✓ 9:16 card ready — download below</span>';
+}
+
+/* ── 16:9 card (1920 × 1080) ─────────────────────────────── */
+
+async function generateCard16x9() {
+  var statusEl = document.getElementById('card-status');
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--text3);">⏳ Generating 16:9 card…</span>';
+
+  var W = 1920, H = 1080;
+  var canvas  = document.getElementById('card-canvas-16x9');
+  var preview = document.getElementById('card-preview-16x9');
+  canvas.width = W; canvas.height = H;
+
+  var player  = document.getElementById('card-player').value.trim()     || 'PLAYER NAME';
+  var prop    = document.getElementById('card-prop').value.trim()        || 'PROP LINE';
+  var proj    = document.getElementById('card-projected').value.trim()   || '—';
+  var hr      = document.getElementById('card-hitrate').value.trim()     || '—';
+  var edgeVal = document.getElementById('card-edge').value.trim()        || '—';
+  var conf    = document.getElementById('card-confidence').value.trim()  || 'HIGH';
+  var matchup = document.getElementById('card-matchup').value.trim()     || 'TEAM A vs TEAM B';
+
+  var playerImg = await _cardLoadImage(document.getElementById('card-photo-url').value);
+  var logoImg   = await _cardLoadImage(document.getElementById('card-logo-url').value);
+
+  var ctx = canvas.getContext('2d');
+
+  // Background
+  var bgG2 = ctx.createLinearGradient(0, 0, W, H);
+  bgG2.addColorStop(0, '#020810'); bgG2.addColorStop(0.5, '#050d1c'); bgG2.addColorStop(1, '#020810');
+  ctx.fillStyle = bgG2; ctx.fillRect(0, 0, W, H);
+  _bgGrid(ctx, W, H, 55, 'rgba(41,121,200,0.04)');
+
+  // Corner brackets
+  _cornerBrackets(ctx, W, H, 96, 5, '#c9a227');
+
+  /* LEFT PANEL  x: 60–530 */
+  var lX = 64, lW = 470;
+
+  // Logo (left-aligned)
+  ctx.save();
+  ctx.font = 'bold 42px Arial,Helvetica,sans-serif'; ctx.fillStyle = '#c9a227'; ctx.textAlign = 'left';
+  ctx.fillText('THE EDGE REPORT', lX, 88);
+  ctx.font = '16px Arial,Helvetica,sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.48)';
+  ctx.fillText('WHERE THE DATA BEATS VEGAS', lX, 114);
+  ctx.strokeStyle = 'rgba(201,162,39,0.28)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(lX, 128); ctx.lineTo(lX+lW, 128); ctx.stroke();
+  ctx.restore();
+
+  // Sport icons (left)
+  var icL = ['⚾','🏈','🏀','🏒','⚽'];
+  var icLY = 160, icLSpacing = 50, icLStartX = lX + 14;
+  icL.forEach(function(ic,i){
+    ctx.save(); ctx.globalAlpha = i===0?1.0:0.20;
+    ctx.font = '22px Arial'; ctx.textAlign = 'center';
+    ctx.fillText(ic, icLStartX+i*icLSpacing, icLY); ctx.restore();
+  });
+
+  // Pick banner (left panel)
+  _pickBanner(ctx, lX, 182, lW, 56, 'MLB PROP PICK');
+
+  // Name box (left panel)
+  _nameBox(ctx, lX, 252, lW, 108, player, prop, 26, 14);
+
+  // 3 stat boxes stacked left
+  var slY = 376, slH = 94, slGap = 12;
+  [{label:'PROJECTED',value:proj},{label:'HIT RATE',value:hr},{label:'EDGE',value:edgeVal}]
+    .forEach(function(s,i){ _statBox(ctx, lX, slY+i*(slH+slGap), lW, slH, s.label, s.value, 12, 30); });
+
+  /* CENTER — Player photo  cx ≈ 960 */
+  var pCX = 960, pCY = 480, pR = 330;
+  _playerCircle(ctx, pCX, pCY, pR, playerImg);
+  _logoCircle(ctx, pCX+pR-36, pCY+pR-36, 104, logoImg);
+
+  /* RIGHT PANEL  x: 1390–1856 */
+  var rX = 1390, rW = 466;
+  var rsH = 156, rsGap = 18;
+  var rsTotalH = 3*rsH + 2*rsGap;
+  var rsY = (H - rsTotalH) / 2 - 20;
+  [
+    {label:'MODEL CONFIDENCE', value:conf},
+    {label:'PROJECTED VALUE',  value:proj},
+    {label:'OUR EDGE RATING',  value:edgeVal}
+  ].forEach(function(s,i){ _statBox(ctx, rX, rsY+i*(rsH+rsGap), rW, rsH, s.label, s.value, 13, 38); });
+
+  /* BOTTOM BAND  y: 880–1000 */
+  var bbY = 880, bbH = 80;
+  ctx.fillStyle = '#050c1c'; ctx.fillRect(0, bbY, W, bbH);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(41,121,200,0.22)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, bbY); ctx.lineTo(W, bbY); ctx.stroke();
+  var bbStats = [
+    {label:'MODEL CONFIDENCE', value:conf},
+    {label:'PROJECTED VALUE',  value:proj},
+    {label:'MATCHUP',          value:matchup.length>22?matchup.substring(0,22)+'…':matchup},
+    {label:'LINE MOVEMENT',    value:'→ FAVORABLE'}
+  ];
+  var bbColW = W/4;
+  bbStats.forEach(function(s,i){
+    var bCX2 = i*bbColW + bbColW/2;
+    if (i>0) {
+      ctx.beginPath(); ctx.moveTo(i*bbColW, bbY+10); ctx.lineTo(i*bbColW, bbY+bbH-10); ctx.stroke();
+    }
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 11px Arial'; ctx.fillStyle = 'rgba(255,255,255,0.36)';
+    ctx.fillText(s.label.toUpperCase(), bCX2, bbY+22);
+    ctx.font = 'bold '+(i===2?'15':'20')+'px Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(s.value||'—', bCX2, bbY+58);
+  });
+  ctx.restore();
+
+  /* FOOTER */
+  _footer(ctx, 0, 1000, W, 80, 13);
+
+  // Copy to preview
+  preview.width = W; preview.height = H;
+  preview.getContext('2d').drawImage(canvas, 0, 0);
+  document.getElementById('card-16x9-wrap').style.display = 'block';
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--green);">✓ 16:9 card ready — download below</span>';
+}
+
+/* ── Download helper ──────────────────────────────────────── */
+
+function downloadCard(canvasId, filename) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas || !canvas.width) { alert('Generate the card first.'); return; }
+  var link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 /* ============================================================
