@@ -8,7 +8,7 @@ MLB_Edge_Model_v1.2.html.
 
 Data sources
   ● Odds API v4  — game lines (ML, total, run line) + player props
-  ● BigDataBall  — season batter / pitcher stats (for edge calc)
+  ● BigBallsData — season player stats (for edge calc)
 
 Output  →  mlb_edge_data.json  (MODEL_DATA-compatible)
 
@@ -19,7 +19,7 @@ Usage
   python mlb_edge_data_pull.py --dry-run            # no file write
   python mlb_edge_data_pull.py --verbose            # debug logging
   python mlb_edge_data_pull.py --no-props           # skip prop pull
-  python mlb_edge_data_pull.py --no-stats           # skip BigDataBall
+  python mlb_edge_data_pull.py --no-stats           # skip BigBallsData
 
 Config  (in priority order)
   1. .env file in same directory as this script
@@ -29,7 +29,7 @@ Required env vars
   ODDS_API_KEY      Your Odds API key (https://the-odds-api.com)
 
 Optional env vars
-  BIGBALL_API_KEY   BigDataBall API key (stats/projections)
+  BIGBALL_API_KEY   BigBallsData API key (bigballsdata.com)
   ODDS_REGION       us | uk | au | eu  (default: us)
   ODDS_BOOKS        Comma-separated bookmakers  (default: draftkings,fanduel,betmgm,bet365_us)
   EDGE_MIN_PCT      Minimum edge % to include in output  (default: 0)
