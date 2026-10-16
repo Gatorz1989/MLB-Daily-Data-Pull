@@ -619,11 +619,62 @@ def enrich_props_with_projections(
     return enriched
 
 
+def fetch_probable_pitchers(date_str: str) -> dict[str, str]:
+    """
+    Fetch probable starters from the free MLB Stats API schedule endpoint.
+    Returns {full_team_name: pitcher_full_name} for each side of every game.
+    Falls back to empty dict on any error.
+    """
+    url    = f"{MLB_STATS_BASE}/schedule"
+    params = {
+        "sportId": 1,
+        "date":    date_str,
+        "hydrate": "probablePitcher,team",
+        "gameType": "R",
+    }
+    try:
+        log.info(f"Fetching probable pitchers for {date_str} …")
+        resp = requests.get(url, params=params, timeout=20)
+        resp.raise_for_status()
+        data   = resp.json()
+        result = {}
+        for day in data.get("dates", []):
+            for g in day.get("games", []):
+                teams = g.get("teams", {})
+                for side in ("away", "home"):
+                    t   = teams.get(side, {})
+                    pitcher = t.get("probablePitcher", {})
+                    name    = pitcher.get("fullName", "")
+                    team    = t.get("team", {}).get("name", "")
+                    if name and team:
+                        result[team] = name
+        log.info(f"  {len(result)} probable pitchers found")
+        return result
+    except Exception as e:
+        log.warning(f"Probable pitcher fetch failed: {e}")
+        return {}
+
+
+def inject_probable_pitchers(games: list[dict],
+                             pitcher_map: dict[str, str]) -> list[dict]:
+    """
+    Set awayPitcher / homePitcher on each game using the probable-pitcher map.
+    Matches by full team name (case-insensitive).
+    """
+    norm = {k.lower(): v for k, v in pitcher_map.items()}
+    for game in games:
+        for side in ("away", "home"):
+            team = game.get(f"{side}Team", "")
+            name = norm.get(team.lower(), "")
+            if name:
+                game[f"{side}Pitcher"] = name
+    return games
+
+
 def attach_sp_stats(games: list[dict], pitchers: list[dict]) -> list[dict]:
     """
-    Try to match starting pitcher names from game data (if BigBallsData
-    provides them) to stats. If pitchers list is empty, games come back
-    with TBD starters.
+    Cross-reference pitcher names already on each game against season stats.
+    Populates ERA, K9, WHIP for any pitcher found in the stats list.
     """
     pitcher_map = {p["name"].lower(): p for p in pitchers}
     for game in games:
@@ -752,6 +803,12 @@ def main() -> None:
         props = enrich_props_with_projections(props, batters, pitchers, edge_min)
     else:
         log.info("No stats available — props included without projections (edge=0).")
+
+    # ── Step 4b: Inject probable starters (MLB Stats API — free) ──────
+    if not args.no_stats and games:
+        prob_map = fetch_probable_pitchers(date_str)
+        if prob_map:
+            games = inject_probable_pitchers(games, prob_map)
 
     # ── Step 5: Attach SP stats to games ───────────────────────────────
     if pitchers:

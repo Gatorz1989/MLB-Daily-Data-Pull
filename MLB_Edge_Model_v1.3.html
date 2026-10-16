@@ -321,6 +321,7 @@ textarea.script-box:focus{border-color:var(--gold);}
         </select>
         <button class="btn btn-outline btn-sm" onclick="toggleManualGame()">✏️ Manual Entry</button>
       </div>
+      <div id="matchup-date-line" style="font-size:11px;color:var(--text3);margin-top:4px;display:none;">📅 Data as of: <span id="matchup-date-val">—</span></div>
     </div>
   </div>
 
@@ -1631,7 +1632,7 @@ function dcTestHeyGen(){
   var k=(document.getElementById('dc-heygen-key').value||safeLoad('mlb_heygen_key')).trim();
   if(!k){showStatus('heygen-status','⚠️ Enter HeyGen key first.','warn');return;}
   showStatus('heygen-status','⏳ Testing HeyGen…','info');
-  fetch('https://api.heygen.com/v1/template.list',{headers:{'X-Api-Key':k}})
+  fetch('https://api.heygen.com/v2/templates',{headers:{'x-api-key':k}})
     .then(function(r){if(r.ok){showStatus('heygen-status','✅ HeyGen key valid.','ok');safeSave('mlb_heygen_key',k);}else{showStatus('heygen-status','❌ HeyGen error '+r.status,'err');}})
     .catch(function(e){showStatus('heygen-status','❌ Network error: '+e.message,'err');});
 }
@@ -1807,29 +1808,38 @@ function scoreProps() {
 /* ---------- Matchup Tab ---------- */
 
 function populateGameSelector() {
-  var sel = document.getElementById('game-selector');
+  var sel = document.getElementById('matchup-game-sel');
   if (!sel) return;
   while (sel.options.length > 1) sel.remove(1);
-  (MODEL_DATA.games || []).forEach(function(g, i) {
+  var games = MODEL_DATA.games || [];
+  games.forEach(function(g, i) {
     var opt = document.createElement('option');
     opt.value = i;
     opt.textContent = (g.awayTeam || 'Away') + ' @ ' + (g.homeTeam || 'Home') +
       (g.time ? '  ' + g.time : '');
     sel.appendChild(opt);
   });
+  // Show/hide no-data notice
+  var notice = document.getElementById('matchup-no-data-notice');
+  if (notice) notice.style.display = games.length ? 'none' : '';
+  // Show data date line
+  var dateLine = document.getElementById('matchup-date-line');
+  var dateVal  = document.getElementById('matchup-date-val');
+  if (dateLine && games.length) {
+    dateLine.style.display = '';
+    if (dateVal) dateVal.textContent = MODEL_DATA.pullTime || '—';
+  }
 }
 
-function selectGame() {
-  var sel = document.getElementById('game-selector');
-  if (!sel) return;
-  var idx = parseInt(sel.value);
+function selectGame(val) {
+  var idx = parseInt(val);
   if (isNaN(idx) || idx < 0) { CURRENT_GAME = null; renderMatchupTab(); return; }
   CURRENT_GAME = MODEL_DATA.games[idx] || null;
   renderMatchupTab();
 }
 
 function toggleManualGame() {
-  var box = document.getElementById('manual-game-box');
+  var box = document.getElementById('matchup-manual-form');
   if (!box) return;
   box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
@@ -1837,86 +1847,107 @@ function toggleManualGame() {
 function buildManualMatchup() {
   var get = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
   _MANUAL_GAME = {
-    awayTeam: get('mg-away') || 'Away',
-    homeTeam: get('mg-home') || 'Home',
-    awayPitcher: get('mg-away-sp') || '—',
-    homePitcher: get('mg-home-sp') || '—',
-    awayERA: parseFloat(get('mg-away-era')) || 0,
-    homeERA: parseFloat(get('mg-home-era')) || 0,
-    awayK9: parseFloat(get('mg-away-k9')) || 0,
-    homeK9: parseFloat(get('mg-home-k9')) || 0,
-    awayWHIP: parseFloat(get('mg-away-whip')) || 0,
-    homeWHIP: parseFloat(get('mg-home-whip')) || 0,
-    total: parseFloat(get('mg-total')) || 0,
-    awayML: parseInt(get('mg-away-ml')) || 0,
-    homeML: parseInt(get('mg-home-ml')) || 0,
-    park: get('mg-park') || ''
+    awayTeam:    get('mm-away-team') || 'Away',
+    homeTeam:    get('mm-home-team') || 'Home',
+    awayPitcher: get('mm-away-sp')   || '—',
+    homePitcher: get('mm-home-sp')   || '—',
+    awayERA:     parseFloat(get('mm-away-era'))  || 0,
+    homeERA:     parseFloat(get('mm-home-era'))  || 0,
+    awayK9:      parseFloat(get('mm-away-k9'))   || 0,
+    homeK9:      parseFloat(get('mm-home-k9'))   || 0,
+    awayWHIP:    parseFloat(get('mm-away-whip')) || 0,
+    homeWHIP:    parseFloat(get('mm-home-whip')) || 0,
+    total:       parseFloat(get('mm-ou'))         || 0,
+    time:        get('mm-time') || ''
   };
   CURRENT_GAME = _MANUAL_GAME;
-  var box = document.getElementById('manual-game-box');
+  var box = document.getElementById('matchup-manual-form');
   if (box) box.style.display = 'none';
   renderMatchupTab();
 }
 
 function renderMatchupTab() {
   var g = CURRENT_GAME;
-  var projDiv = document.getElementById('matchup-projection');
-  if (!projDiv) return;
+  var display = document.getElementById('matchup-display');
+  if (!display) return;
 
   if (!g) {
-    projDiv.innerHTML = '<div class="no-data-notice">Select a game above or enter details manually to view the matchup breakdown.</div>';
+    display.style.display = 'none';
     return;
   }
 
-  // Park factors lookup
-  var parkKey = (g.homeTeam || '').toLowerCase().replace(/\s+/g,'_');
-  var parkData = MLB_TEAMS[parkKey] || {};
-  var parkFactor = parkData.parkFactor || 100;
-  var parkLabel = parkFactor > 100 ? 'Hitter-friendly' : parkFactor < 100 ? 'Pitcher-friendly' : 'Neutral';
-  var parkClass = parkFactor > 100 ? 'status-success' : parkFactor < 100 ? 'status-warning' : '';
+  display.style.display = '';
 
-  // SP comparison
-  var spHtml = '<div class="sp-compare">' +
-    '<div class="sp-card">' +
-      '<div class="sp-name">' + esc(g.awayPitcher || '—') + '</div>' +
-      '<div class="sp-team">' + esc(g.awayTeam || '') + ' (Away)</div>' +
-      '<div class="sp-stats">' +
-        '<span>ERA <b>' + (g.awayERA || '—') + '</b></span>' +
-        '<span>K/9 <b>' + (g.awayK9 || '—') + '</b></span>' +
-        '<span>WHIP <b>' + (g.awayWHIP || '—') + '</b></span>' +
-      '</div>' +
-    '</div>' +
-    '<div class="sp-vs">VS</div>' +
-    '<div class="sp-card">' +
-      '<div class="sp-name">' + esc(g.homePitcher || '—') + '</div>' +
-      '<div class="sp-team">' + esc(g.homeTeam || '') + ' (Home)</div>' +
-      '<div class="sp-stats">' +
-        '<span>ERA <b>' + (g.homeERA || '—') + '</b></span>' +
-        '<span>K/9 <b>' + (g.homeK9 || '—') + '</b></span>' +
-        '<span>WHIP <b>' + (g.homeWHIP || '—') + '</b></span>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
+  // Header
+  var titleEl = document.getElementById('matchup-title');
+  var timeEl  = document.getElementById('matchup-time');
+  if (titleEl) titleEl.textContent = esc(g.awayTeam || 'Away') + ' @ ' + esc(g.homeTeam || 'Home');
+  if (timeEl)  timeEl.textContent  = g.time || '';
 
-  var projHtml = '<div class="card" style="margin-top:12px">' +
-    '<h3 style="margin:0 0 10px">Game Projection</h3>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">' +
-      '<div><div class="stat-label">Total (O/U)</div><div class="stat-big">' + (g.total || '—') + '</div></div>' +
-      '<div><div class="stat-label">' + esc(g.awayTeam || 'Away') + ' ML</div><div class="stat-big">' + fmtOdds(g.awayML) + '</div></div>' +
-      '<div><div class="stat-label">' + esc(g.homeTeam || 'Home') + ' ML</div><div class="stat-big">' + fmtOdds(g.homeML) + '</div></div>' +
-    '</div>' +
-  '</div>' +
-  '<div class="card" style="margin-top:12px">' +
-    '<h3 style="margin:0 0 10px">Park Factors — ' + esc(g.park || (g.homeTeam || 'Home') + ' Park') + '</h3>' +
-    '<div style="display:flex;align-items:center;gap:16px">' +
+  // O/U badge in VS block
+  var ouEl = document.getElementById('matchup-ou');
+  if (ouEl) ouEl.textContent = g.total ? 'O/U ' + g.total : 'O/U —';
+
+  // Away SP card
+  setText('sp-away-name', g.awayPitcher || '—');
+  setText('sp-away-team', esc(g.awayTeam || '') + ' (Away)');
+  setText('sp-away-era',  g.awayERA  || '—');
+  setText('sp-away-k9',   g.awayK9   || '—');
+  setText('sp-away-whip', g.awayWHIP || '—');
+
+  // Home SP card
+  setText('sp-home-name', g.homePitcher || '—');
+  setText('sp-home-team', esc(g.homeTeam || '') + ' (Home)');
+  setText('sp-home-era',  g.homeERA  || '—');
+  setText('sp-home-k9',   g.homeK9   || '—');
+  setText('sp-home-whip', g.homeWHIP || '—');
+
+  // Park Factors — look up by full team name against MLB_TEAMS abbreviation keys
+  var parkData = {};
+  if (g.homeTeam) {
+    var _ht = g.homeTeam.toLowerCase();
+    for (var _abbr in MLB_TEAMS) {
+      if ((MLB_TEAMS[_abbr].name || '').toLowerCase() === _ht) { parkData = MLB_TEAMS[_abbr]; break; }
+    }
+  }
+  var parkFactor = parkData.parkFactor ? Math.round(parkData.parkFactor * 100) : 100;
+  var parkName   = parkData.park || (g.homeTeam || 'Home') + ' Park';
+  var parkLabel  = parkFactor > 100 ? 'Hitter-friendly' : parkFactor < 100 ? 'Pitcher-friendly' : 'Neutral';
+  var parkClass  = parkFactor > 100 ? 'status-success' : parkFactor < 100 ? 'status-warning' : '';
+  var parkEl     = document.getElementById('park-factor-body');
+  if (parkEl) parkEl.innerHTML =
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:6px;">' + esc(parkName) + '</div>' +
+    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
       '<div class="stat-big">' + parkFactor + '</div>' +
-      '<div><span class="status-badge ' + parkClass + '">' + parkLabel + '</span>' +
-        (parkData.isIndoor ? '<span class="status-badge" style="margin-left:6px">Indoor</span>' : '') +
+      '<div>' +
+        '<span class="status-badge ' + parkClass + '">' + parkLabel + '</span>' +
+        (parkData.isIndoor ? '<span class="status-badge" style="margin-left:6px">🏟️ Indoor</span>' : '') +
       '</div>' +
-    '</div>' +
-  '</div>';
+    '</div>';
 
-  projDiv.innerHTML = spHtml + projHtml;
+  // Game Projection
+  var marketOU = g.total || 0;
+  setText('proj-score-display', esc(g.awayTeam || 'Away') + ' vs ' + esc(g.homeTeam || 'Home'));
+  setText('proj-total',     marketOU ? marketOU.toString() : '—');
+  setText('proj-market-ou', marketOU ? marketOU.toString() : '—');
+  // Simple edge: if both pitchers have ERA, estimate total vs market
+  var edgeEl = document.getElementById('proj-ou-edge');
+  if (edgeEl) {
+    if (g.awayERA && g.homeERA && marketOU) {
+      var estTotal = Math.round(((parseFloat(g.awayERA) + parseFloat(g.homeERA)) / 2) * 1.8 * 10) / 10;
+      var edge = Math.round((estTotal - marketOU) * 10) / 10;
+      edgeEl.textContent = (edge > 0 ? '+' : '') + edge + ' (est. ' + estTotal + ')';
+      edgeEl.style.color = edge > 0 ? 'var(--green)' : edge < 0 ? 'var(--red)' : '';
+    } else {
+      edgeEl.textContent = '—';
+      edgeEl.style.color = '';
+    }
+  }
+}
+
+function setText(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
 }
 
 /* ---------- Props Tab ---------- */
