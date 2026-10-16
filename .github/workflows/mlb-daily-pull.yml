@@ -2,7 +2,7 @@ name: MLB Daily Data Pull
 
 on:
   schedule:
-    # Runs at 11:00 AM ET (15:00 UTC) — after morning lines are set
+    # Runs at 8:00 AM ET (15:00 UTC) — after morning lines are set
     - cron: '0 15 * * *'
   workflow_dispatch:   # manual trigger from the Actions tab
 
