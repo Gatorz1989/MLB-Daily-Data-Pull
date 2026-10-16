@@ -1042,7 +1042,7 @@ textarea.script-box:focus{border-color:var(--gold);}
       <div id="github-status" class="status-box"></div>
       <div class="form-row">
         <label>GitHub Repo</label>
-        <input type="text" id="dc-github-repo" placeholder="Gatorz1989/MLB_Data_Pull">
+        <input type="text" id="dc-github-repo" placeholder="Gatorz1989/MLB-Daily-Data-Pull">
         <button class="btn btn-primary btn-sm" onclick="dcSaveGitHub()">Save</button>
       </div>
       <div class="form-row">
@@ -1606,7 +1606,7 @@ function loadSavedKeys() {
     'dc-heygen-intro':'f45cf2139afe44d2bdf9abe9a1e1e44a',
     'dc-heygen-short':'9378f12ef1f14b11b435be56c6faf89f',
     'exp-sender':'picks@youredgereport.com',
-    'dc-github-repo':'Gatorz1989/MLB_Data_Pull',
+    'dc-github-repo':'Gatorz1989/MLB-Daily-Data-Pull',
     'dc-github-file':'mlb_edge_data.json'
   };
   Object.keys(defaults).forEach(function(id){
@@ -1663,14 +1663,14 @@ function dcTestDiscord(){
 }
 function dcSaveGitHub(){
   var pat=(document.getElementById('dc-github-pat').value||'').trim();
-  var repo=(document.getElementById('dc-github-repo').value||'Gatorz1989/MLB_Data_Pull').trim();
+  var repo=(document.getElementById('dc-github-repo').value||'Gatorz1989/MLB-Daily-Data-Pull').trim();
   var file=((document.getElementById('dc-github-file')||{}).value||'mlb_edge_data.json').trim();
   safeSave('mlb_github_pat',pat); safeSave('mlb_github_repo',repo); safeSave('mlb_github_file',file);
   showStatus('github-status','✅ GitHub settings saved. PAT: '+maskKey(pat)+' | Repo: '+repo+' | File: '+file,'ok');
 }
 function dcTestGitHub(){
   var pat=(document.getElementById('dc-github-pat').value||safeLoad('mlb_github_pat')).trim();
-  var repo=(document.getElementById('dc-github-repo').value||safeLoad('mlb_github_repo')||'Gatorz1989/MLB_Data_Pull').trim();
+  var repo=(document.getElementById('dc-github-repo').value||safeLoad('mlb_github_repo')||'Gatorz1989/MLB-Daily-Data-Pull').trim();
   if(!pat){showStatus('github-status','⚠️ Enter GitHub PAT first.','warn');return;}
   showStatus('github-status','⏳ Testing GitHub…','info');
   fetch('https://api.github.com/repos/'+repo,{headers:{'Authorization':'token '+pat}})
@@ -1708,7 +1708,7 @@ function dcTestAllKeys(){
 
 // ── CLOUD / UPLOAD ─────────────────────────────────────────────────
 function dcLoadCloud(isAutoLoad) {
-  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB_Data_Pull';
+  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB-Daily-Data-Pull';
   var pat  = safeLoad('mlb_github_pat');
   var file = safeLoad('mlb_github_file') || 'mlb_edge_data.json';
   var iconEl = document.getElementById('cloud-load-icon');
@@ -3282,7 +3282,7 @@ function labResetCalibration() {
 }
 
 function labPushCalibration() {
-  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB_Data_Pull';
+  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB-Daily-Data-Pull';
   var pat  = safeLoad('mlb_github_pat');
   var file = (document.getElementById('lab-cal-file').value||'').trim() || 'mlb_calibration.json';
   safeSave('mlb_lab_cal_file', file);
@@ -3320,7 +3320,7 @@ function labPushCalibration() {
 }
 
 function labPullCalibration() {
-  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB_Data_Pull';
+  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB-Daily-Data-Pull';
   var pat  = safeLoad('mlb_github_pat');
   var file = (document.getElementById('lab-cal-file').value||'').trim() || 'mlb_calibration.json';
   var headers = {}; if (pat) headers['Authorization'] = 'token '+pat;
