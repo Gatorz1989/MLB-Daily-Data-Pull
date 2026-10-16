@@ -1,0 +1,3518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLB Edge Model v1.3 — The Edge Report</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a0e1a;--bg2:#0f1526;--bg3:#151c30;--bg4:#1a2240;
+  --card:#12192d;--card2:#1a2340;
+  --border:#1e2d4a;--border2:#243356;
+  --gold:#2979c8;--gold2:#4a9dde;--gold3:#6ab2e8;
+  --green:#39d353;--red:#ff4d4d;--blue:#4d9fff;
+  --purple:#9b59b6;--cyan:#00d4ff;--orange:#f39c12;
+  --text:#e8edf5;--text2:#a0aec0;--text3:#6b7fa3;
+  --elite:#ff6b35;--strong:#2979c8;--lean:#4d9fff;--skip:#6b7fa3;
+  --tab-h:40px;--hdr-h:56px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden;}
+#hdr{height:var(--hdr-h);background:linear-gradient(135deg,#07091a 0%,#0d1428 50%,#07091a 100%);border-bottom:2px solid var(--gold);display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(41,121,200,0.15);}
+#hdr-logo{display:flex;align-items:center;gap:10px;}
+#hdr-logo svg{width:32px;height:32px;}
+#hdr-brand{display:flex;flex-direction:column;line-height:1.1;}
+#hdr-brand .name{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;}
+#hdr-brand .sub{font-size:10px;color:var(--text3);letter-spacing:0.5px;}
+#hdr-ver{margin-left:4px;background:rgba(41,121,200,0.15);border:1px solid var(--gold);color:var(--gold);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:0.5px;}
+#hdr-sport{margin-left:6px;background:rgba(0,180,100,0.15);border:1px solid #00b464;color:#00d97a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:0.5px;}
+#hdr-season{margin-left:auto;font-size:11px;color:var(--text3);}
+#hdr-status{display:flex;align-items:center;gap:6px;margin-left:12px;}
+.hdr-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;letter-spacing:0.3px;}
+.chip-ok{background:rgba(57,211,83,0.15);border:1px solid rgba(57,211,83,0.4);color:var(--green);}
+.chip-warn{background:rgba(243,156,18,0.15);border:1px solid rgba(243,156,18,0.4);color:var(--orange);}
+.chip-err{background:rgba(255,77,77,0.15);border:1px solid rgba(255,77,77,0.4);color:var(--red);}
+.chip-info{background:rgba(77,159,255,0.15);border:1px solid rgba(77,159,255,0.4);color:var(--blue);}
+#tab-bar{height:var(--tab-h);background:var(--bg2);border-bottom:2px solid var(--border);display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--hdr-h);z-index:100;}
+#tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{display:flex;align-items:center;padding:0 13px;font-size:11px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;color:var(--text3);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;border-top:3px solid transparent;white-space:nowrap;transition:all 0.2s;border-right:1px solid var(--border);user-select:none;}
+.tab-btn:hover{color:var(--text);background:rgba(41,121,200,0.05);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:linear-gradient(to bottom,transparent,rgba(41,121,200,0.08));}
+#main{padding:16px;max-width:1400px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+.card-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--card2);}
+.card-hdr h3{font-size:12px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--gold);}
+.card-body{padding:14px;}
+.form-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.form-row label{font-size:11px;color:var(--text2);width:130px;flex-shrink:0;font-weight:600;letter-spacing:0.3px;}
+.form-row input[type=text],.form-row input[type=password],.form-row input[type=date],.form-row input[type=number],.form-row select{flex:1;min-width:120px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;outline:none;transition:border-color 0.2s;}
+.form-row input:focus,.form-row select:focus{border-color:var(--gold);}
+.form-row small{font-size:10px;color:var(--text3);margin-left:2px;}
+.toggle-pw{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;letter-spacing:0.3px;}
+.btn-primary{background:linear-gradient(135deg,#1a5fa0,#2979c8);color:#000;}
+.btn-primary:hover{background:linear-gradient(135deg,#2979c8,#4a9dde);transform:translateY(-1px);}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-green{background:rgba(57,211,83,0.2);border:1px solid var(--green);color:var(--green);}
+.btn-green:hover{background:rgba(57,211,83,0.3);}
+.btn-blue{background:rgba(77,159,255,0.2);border:1px solid var(--blue);color:var(--blue);}
+.btn-blue:hover{background:rgba(77,159,255,0.3);}
+.btn-red{background:rgba(255,77,77,0.15);border:1px solid var(--red);color:var(--red);}
+.btn-red:hover{background:rgba(255,77,77,0.25);}
+.btn-sm{padding:4px 10px;font-size:11px;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+.status-box{padding:8px 12px;border-radius:6px;font-size:12px;margin-top:8px;display:none;white-space:pre-wrap;}
+.status-box.ok{background:rgba(57,211,83,0.1);border:1px solid rgba(57,211,83,0.3);color:var(--green);}
+.status-box.err{background:rgba(255,77,77,0.1);border:1px solid rgba(255,77,77,0.3);color:var(--red);}
+.status-box.info{background:rgba(77,159,255,0.1);border:1px solid rgba(77,159,255,0.3);color:var(--blue);}
+.status-box.warn{background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.3);color:var(--orange);}
+.status-box.show{display:block;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+.stub-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;text-align:center;gap:12px;opacity:0.6;}
+.stub-panel .stub-icon{font-size:48px;}
+.stub-panel h2{font-size:18px;font-weight:700;color:var(--gold);}
+.stub-panel p{font-size:13px;color:var(--text2);max-width:380px;}
+.stub-panel .stage-badge{background:rgba(77,159,255,0.15);border:1px solid var(--blue);color:var(--blue);font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px;letter-spacing:0.5px;}
+.key-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.key-row:last-child{border-bottom:none;}
+.key-name{font-size:11px;font-weight:600;color:var(--text2);width:140px;flex-shrink:0;}
+.key-val{flex:1;font-size:11px;font-family:monospace;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.key-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+.ks-ok{background:rgba(57,211,83,0.15);color:var(--green);}
+.ks-none{background:rgba(107,127,163,0.15);color:var(--text3);}
+.ks-err{background:rgba(255,77,77,0.15);color:var(--red);}
+#cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-hdr{font-size:10px;font-weight:700;text-align:center;color:var(--text3);padding:4px 0;letter-spacing:0.5px;}
+.cal-cell{min-height:54px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px;cursor:default;transition:border-color 0.15s;}
+.cal-cell:hover{border-color:var(--border2);}
+.cal-cell.today{border-color:var(--gold);background:rgba(41,121,200,0.06);}
+.cal-cell.has-event{border-color:var(--blue);background:rgba(77,159,255,0.05);}
+.cal-cell.other-month{opacity:0.3;}
+.cal-date{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:2px;}
+.cal-cell.today .cal-date{color:var(--gold);}
+.cal-event{font-size:9px;padding:1px 4px;border-radius:2px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ev-game{background:rgba(57,211,83,0.2);color:var(--green);}
+.ev-pull{background:rgba(41,121,200,0.2);color:var(--gold);}
+.ev-report{background:rgba(77,159,255,0.2);color:var(--blue);}
+.ev-season{background:rgba(155,89,182,0.2);color:var(--purple);}
+#cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+#cal-title{font-size:14px;font-weight:700;color:var(--text);min-width:160px;text-align:center;}
+.sec-hdr{display:inline-flex;align-items:center;gap:6px;background:rgba(41,121,200,0.12);border:1px solid rgba(41,121,200,0.3);color:var(--gold);font-size:11px;font-weight:700;letter-spacing:0.6px;padding:4px 12px;border-radius:12px;margin-bottom:12px;text-transform:uppercase;}
+.sep{height:1px;background:var(--border);margin:14px 0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#2d4570;}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.stat-row:last-child{border-bottom:none;}
+.stat-lbl{color:var(--text2);}
+.stat-val{color:var(--text);font-weight:600;}
+.export-step{border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;}
+.export-step-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--border);}
+.step-num{width:24px;height:24px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0;}
+.export-step-hdr h4{font-size:12px;font-weight:700;color:var(--text);letter-spacing:0.3px;}
+.export-step-body{padding:12px 14px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-lbl{font-size:12px;color:var(--text2);}
+.toggle-switch{position:relative;width:36px;height:20px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;cursor:pointer;transition:0.3s;}
+.toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:2px;bottom:2px;background:var(--text3);border-radius:50%;transition:0.3s;}
+.toggle-switch input:checked + .toggle-slider{background:rgba(41,121,200,0.2);border-color:var(--gold);}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(16px);background:var(--gold);}
+.aff-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;}
+.aff-name{font-size:13px;font-weight:700;color:var(--gold);}
+.aff-code{font-size:11px;color:var(--text2);}
+.aff-code span{font-family:monospace;color:var(--text);background:var(--bg4);padding:1px 6px;border-radius:3px;}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(41,121,200,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── STAGE 2 STYLES ───────────────────────────────────────── */
+.no-data-notice{background:rgba(77,159,255,0.08);border:1px solid rgba(77,159,255,0.25);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:14px;}
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--border);}
+.filter-bar label{font-size:11px;color:var(--text2);font-weight:600;}
+.filter-bar select,.filter-bar input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 8px;border-radius:5px;font-size:11px;outline:none;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--gold);}
+.f-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;cursor:pointer;border:1px solid var(--border2);color:var(--text3);background:none;transition:all 0.2s;}
+.f-chip:hover{border-color:var(--gold);color:var(--gold);}
+.f-chip.active{background:rgba(41,121,200,0.15);border-color:var(--gold);color:var(--gold);}
+
+/* Tier badges */
+.tier{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;text-transform:uppercase;}
+.tier-ELITE{background:rgba(255,107,53,0.2);border:1px solid var(--elite);color:var(--elite);}
+.tier-STRONG{background:rgba(41,121,200,0.2);border:1px solid var(--gold);color:var(--gold);}
+.tier-LEAN{background:rgba(77,159,255,0.2);border:1px solid var(--blue);color:var(--blue);}
+.tier-SKIP{background:rgba(107,127,163,0.1);border:1px solid var(--text3);color:var(--text3);}
+
+/* Props table */
+.tbl-wrap{overflow-x:auto;}
+table.data-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+table.data-tbl th{background:var(--card2);color:var(--text2);font-size:11px;font-weight:700;letter-spacing:0.4px;padding:8px 10px;text-align:left;border-bottom:2px solid var(--border2);white-space:nowrap;}
+table.data-tbl th.sort-col{color:var(--gold);}
+table.data-tbl th.sortable{cursor:pointer;user-select:none;}
+table.data-tbl th.sortable:hover{color:var(--gold);}
+table.data-tbl td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+table.data-tbl tr:hover td{background:rgba(255,255,255,0.02);}
+table.data-tbl tr.row-elite td{border-left:3px solid var(--elite);}
+table.data-tbl tr.row-strong td{border-left:3px solid var(--gold);}
+table.data-tbl tr.row-lean td{border-left:3px solid var(--blue);}
+.tbl-empty{text-align:center;color:var(--text3);padding:30px;font-size:13px;}
+
+/* Pick cards */
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;}
+.pick-card{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color 0.2s;}
+.pick-card:hover{border-color:var(--border2);}
+.pick-card.tier-ELITE{border-color:rgba(255,107,53,0.4);}
+.pick-card.tier-STRONG{border-color:rgba(41,121,200,0.35);}
+.pick-card.tier-LEAN{border-color:rgba(77,159,255,0.3);}
+.pick-card-hdr{padding:10px 12px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.pick-card-body{padding:10px 12px;}
+.pick-player{font-size:14px;font-weight:700;color:var(--text);}
+.pick-team{font-size:10px;color:var(--text3);margin-top:1px;}
+.pick-prop{font-size:13px;color:var(--text);margin:6px 0 2px;}
+.pick-prop span{color:var(--gold);font-weight:700;}
+.pick-proj{font-size:11px;color:var(--text2);}
+.pick-edge{font-size:18px;font-weight:800;color:var(--green);}
+.pick-edge.neg{color:var(--red);}
+.pick-actions{display:flex;gap:6px;margin-top:10px;}
+.btn-parlay{font-size:10px;font-weight:700;padding:4px 10px;border-radius:10px;cursor:pointer;border:1px solid var(--border2);color:var(--text3);background:none;transition:all 0.2s;letter-spacing:0.3px;}
+.btn-parlay:hover{border-color:var(--gold);color:var(--gold);}
+.btn-parlay.in-parlay{background:rgba(41,121,200,0.15);border-color:var(--gold);color:var(--gold);}
+
+/* Parlay */
+.parlay-block{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;}
+.parlay-block-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.parlay-block-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.4px;}
+.parlay-odds-chip{font-size:14px;font-weight:800;color:var(--green);padding:3px 10px;background:rgba(57,211,83,0.1);border:1px solid rgba(57,211,83,0.3);border-radius:8px;}
+.parlay-leg{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.parlay-leg:last-child{border-bottom:none;}
+.parlay-leg-num{width:20px;height:20px;border-radius:50%;background:var(--border2);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.parlay-leg-name{flex:1;color:var(--text);}
+.parlay-leg-odds{color:var(--text2);font-size:11px;}
+.parlay-leg-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 4px;}
+.parlay-leg-del:hover{color:var(--red);}
+.parlay-empty{text-align:center;color:var(--text3);padding:20px;font-size:12px;}
+
+/* Matchup */
+.matchup-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;margin-bottom:12px;}
+.sp-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.sp-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.sp-team{font-size:11px;color:var(--text3);}
+.sp-stat{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);}
+.sp-stat:last-child{border-bottom:none;}
+.sp-stat-lbl{color:var(--text2);}
+.sp-stat-val{font-weight:600;color:var(--text);}
+.vs-block{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.vs-badge{font-size:20px;font-weight:900;color:var(--text3);}
+.game-proj{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.proj-score{font-size:28px;font-weight:900;color:var(--text);text-align:center;letter-spacing:2px;}
+.proj-score span{color:var(--gold);}
+
+/* Run Line */
+.rl-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;}
+.rl-teams{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.rl-team{font-size:13px;font-weight:700;color:var(--text);}
+.rl-team.favored{color:var(--gold);}
+.rl-proj{font-size:22px;font-weight:900;text-align:center;color:var(--text);}
+.rl-proj span{color:var(--gold);}
+.rl-edge-row{display:flex;gap:8px;margin-top:8px;}
+.rl-edge-chip{flex:1;text-align:center;padding:6px;border-radius:6px;font-size:11px;font-weight:700;}
+.rl-edge-pos{background:rgba(57,211,83,0.12);border:1px solid rgba(57,211,83,0.3);color:var(--green);}
+.rl-edge-neg{background:rgba(255,77,77,0.1);border:1px solid rgba(255,77,77,0.3);color:var(--red);}
+.rl-edge-neu{background:rgba(107,127,163,0.1);border:1px solid var(--text3);color:var(--text3);}
+
+/* Metrics */
+.metrics-toggle{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border2);border-radius:6px;overflow:hidden;width:fit-content;}
+.metrics-toggle button{padding:7px 18px;font-size:12px;font-weight:600;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;}
+.metrics-toggle button.active{background:rgba(41,121,200,0.2);color:var(--gold);}
+.num{font-family:monospace;font-size:12px;}
+.pos-val{color:var(--green);}
+.neg-val{color:var(--red);}
+
+/* Canvas thumbnail */
+.thumb-wrap{position:relative;margin-bottom:12px;}
+canvas#thumb-preview{width:100%;max-width:640px;border-radius:6px;border:1px solid var(--border);display:block;}
+canvas#thumb-canvas{display:none;}
+
+/* HeyGen script */
+textarea.script-box{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:10px;font-size:12px;line-height:1.6;resize:vertical;outline:none;font-family:inherit;}
+textarea.script-box:focus{border-color:var(--gold);}
+/* Model Lab */
+.lab-nav{transition:all 0.2s;}
+.lab-nav.active{background:rgba(41,121,200,0.15);border-color:var(--gold);color:var(--gold);}
+.lab-tile{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;text-align:center;}
+.lab-tile .lt-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px;}
+.lab-tile .lt-val{font-size:24px;font-weight:800;color:var(--text);}
+.lab-tile .lt-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.lab-win{color:var(--green)!important;} .lab-loss{color:var(--red)!important;} .lab-push{color:var(--text3)!important;}
+.bt-row-win td:last-child{color:var(--green);font-weight:700;}
+.bt-row-loss td:last-child{color:var(--red);font-weight:700;}
+.bt-row-push td:last-child{color:var(--text3);}
+.tier-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.tier-bar-label{font-size:11px;font-weight:700;width:60px;flex-shrink:0;}
+.tier-bar-track{flex:1;background:var(--bg3);border-radius:4px;height:16px;overflow:hidden;}
+.tier-bar-fill{height:100%;border-radius:4px;transition:width 0.3s;}
+.tier-bar-count{font-size:11px;color:var(--text2);width:60px;text-align:right;flex-shrink:0;}
+.bt-by-type-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);}
+.bt-by-type-row:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="14" stroke="#2979c8" stroke-width="1.5" fill="none"/>
+      <path d="M16 4 L28 16 L16 28 L4 16 Z" stroke="#2979c8" stroke-width="1.5" fill="rgba(41,121,200,0.08)"/>
+      <text x="16" y="20" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="9" font-weight="900" fill="#2979c8">MLB</text>
+    </svg>
+    <div id="hdr-brand">
+      <span class="name">The Edge Report</span>
+      <span class="sub">MLB Edge Model</span>
+    </div>
+  </div>
+  <span id="hdr-ver">v1.3</span>
+  <span id="hdr-sport">⚾ POSTSEASON</span>
+  <div id="hdr-status">
+    <span id="chip-data" class="hdr-chip chip-warn">NO DATA</span>
+    <span id="chip-odds" class="hdr-chip chip-warn">NO ODDS</span>
+  </div>
+  <div id="hdr-season" style="font-size:10px;color:var(--text3);text-align:right;">
+    <div id="hdr-date"></div>
+    <div id="hdr-slate" style="color:var(--text3);">No games loaded</div>
+  </div>
+</div>
+
+<div id="tab-bar">
+  <button class="tab-btn" data-tab="tab-matchup">⚾ Matchup</button>
+  <button class="tab-btn" data-tab="tab-props">📊 Props</button>
+  <button class="tab-btn" data-tab="tab-picks">🎯 Top Picks</button>
+  <button class="tab-btn" data-tab="tab-parlays">🔗 Parlays</button>
+  <button class="tab-btn" data-tab="tab-runline">📈 Run Line</button>
+  <button class="tab-btn" data-tab="tab-metrics">📐 Metrics</button>
+  <button class="tab-btn" data-tab="tab-lab">🧪 Model Lab</button>
+  <button class="tab-btn" data-tab="tab-data">🔌 Data</button>
+  <button class="tab-btn" data-tab="tab-export">📤 Export</button>
+  <button class="tab-btn" data-tab="tab-calendar">📅 Calendar</button>
+</div>
+
+<div id="main">
+
+<!-- ── MATCHUP ─────────────────────────────────────────────── -->
+<div id="tab-matchup" class="tab-panel">
+  <div class="card">
+    <div class="card-hdr">
+      <span>⚾</span><h3>Game Selector</h3>
+    </div>
+    <div class="card-body">
+      <div id="matchup-no-data-notice" class="no-data-notice">
+        ℹ️ No data loaded — use the manual entry form below, or load JSON from the Data tab to auto-populate games.
+      </div>
+      <div class="form-row">
+        <label>Select Game</label>
+        <select id="matchup-game-sel" onchange="selectGame(this.value)" style="flex:1;">
+          <option value="">— Select a game —</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="toggleManualGame()">✏️ Manual Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual game entry -->
+  <div id="matchup-manual-form" class="card" style="display:none;">
+    <div class="card-hdr"><span>✏️</span><h3>Manual Game Entry</h3></div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <div class="sec-hdr">Away Team</div>
+          <div class="form-row"><label>Team (abbr)</label><input type="text" id="mm-away-team" placeholder="e.g. NYM" style="max-width:80px;"><select id="mm-away-sel" style="flex:1;" onchange="document.getElementById('mm-away-team').value=this.value"><option value="">— Pick —</option></select></div>
+          <div class="form-row"><label>Starting Pitcher</label><input type="text" id="mm-away-sp" placeholder="Pitcher name"></div>
+          <div class="form-row"><label>ERA</label><input type="number" id="mm-away-era" placeholder="3.45" step="0.01"></div>
+          <div class="form-row"><label>K/9</label><input type="number" id="mm-away-k9" placeholder="9.2" step="0.1"></div>
+          <div class="form-row"><label>WHIP</label><input type="number" id="mm-away-whip" placeholder="1.12" step="0.01"></div>
+        </div>
+        <div>
+          <div class="sec-hdr">Home Team</div>
+          <div class="form-row"><label>Team (abbr)</label><input type="text" id="mm-home-team" placeholder="e.g. LAD" style="max-width:80px;"><select id="mm-home-sel" style="flex:1;" onchange="document.getElementById('mm-home-team').value=this.value"><option value="">— Pick —</option></select></div>
+          <div class="form-row"><label>Starting Pitcher</label><input type="text" id="mm-home-sp" placeholder="Pitcher name"></div>
+          <div class="form-row"><label>ERA</label><input type="number" id="mm-home-era" placeholder="2.80" step="0.01"></div>
+          <div class="form-row"><label>K/9</label><input type="number" id="mm-home-k9" placeholder="10.1" step="0.1"></div>
+          <div class="form-row"><label>WHIP</label><input type="number" id="mm-home-whip" placeholder="0.98" step="0.01"></div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:8px;">
+        <div class="form-row"><label>O/U Line</label><input type="number" id="mm-ou" placeholder="7.5" step="0.5"></div>
+        <div class="form-row"><label>Game Time</label><input type="text" id="mm-time" placeholder="7:08 PM ET"></div>
+      </div>
+      <button class="btn btn-primary" onclick="buildManualMatchup()">⚾ Build Matchup</button>
+      <div id="manual-matchup-status" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- Matchup Display -->
+  <div id="matchup-display" style="display:none;">
+    <div class="card">
+      <div class="card-hdr">
+        <span>⚔️</span>
+        <h3 id="matchup-title">Matchup</h3>
+        <span id="matchup-time" style="margin-left:auto;font-size:11px;color:var(--text3);"></span>
+      </div>
+      <div class="card-body">
+        <div class="matchup-grid">
+          <div class="sp-card" id="sp-away-card">
+            <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.5px;margin-bottom:4px;">AWAY SP</div>
+            <div class="sp-name" id="sp-away-name">—</div>
+            <div class="sp-team" id="sp-away-team">—</div>
+            <div style="margin-top:8px;">
+              <div class="sp-stat"><span class="sp-stat-lbl">ERA</span><span class="sp-stat-val" id="sp-away-era">—</span></div>
+              <div class="sp-stat"><span class="sp-stat-lbl">K/9</span><span class="sp-stat-val" id="sp-away-k9">—</span></div>
+              <div class="sp-stat"><span class="sp-stat-lbl">WHIP</span><span class="sp-stat-val" id="sp-away-whip">—</span></div>
+            </div>
+          </div>
+          <div class="vs-block">
+            <div class="vs-badge">VS</div>
+            <div id="matchup-ou" style="font-size:11px;color:var(--text3);text-align:center;">O/U —</div>
+          </div>
+          <div class="sp-card" id="sp-home-card">
+            <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.5px;margin-bottom:4px;">HOME SP</div>
+            <div class="sp-name" id="sp-home-name">—</div>
+            <div class="sp-team" id="sp-home-team">—</div>
+            <div style="margin-top:8px;">
+              <div class="sp-stat"><span class="sp-stat-lbl">ERA</span><span class="sp-stat-val" id="sp-home-era">—</span></div>
+              <div class="sp-stat"><span class="sp-stat-lbl">K/9</span><span class="sp-stat-val" id="sp-home-k9">—</span></div>
+              <div class="sp-stat"><span class="sp-stat-lbl">WHIP</span><span class="sp-stat-val" id="sp-home-whip">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Park Factors -->
+      <div class="card">
+        <div class="card-hdr"><span>🏟️</span><h3>Park Factors</h3></div>
+        <div class="card-body" id="park-factor-body">—</div>
+      </div>
+      <!-- Game Projection -->
+      <div class="card">
+        <div class="card-hdr"><span>📊</span><h3>Game Projection</h3></div>
+        <div class="card-body">
+          <div class="proj-score" id="proj-score-display">— <span>vs</span> —</div>
+          <div style="margin-top:10px;">
+            <div class="stat-row"><span class="stat-lbl">Projected Total</span><span class="stat-val" id="proj-total">—</span></div>
+            <div class="stat-row"><span class="stat-lbl">Market O/U</span><span class="stat-val" id="proj-market-ou">—</span></div>
+            <div class="stat-row"><span class="stat-lbl">Model Edge</span><span class="stat-val" id="proj-ou-edge">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROPS ──────────────────────────────────────────────── -->
+<div id="tab-props" class="tab-panel">
+  <div class="card" style="overflow:visible;">
+    <div class="filter-bar">
+      <label>Team:</label>
+      <select id="props-filter-team" onchange="renderPropsTab()">
+        <option value="">All Teams</option>
+      </select>
+      <label>Type:</label>
+      <select id="props-filter-type" onchange="renderPropsTab()">
+        <option value="">All Types</option>
+        <option>K</option><option>H</option><option>HR</option>
+        <option>RBI</option><option>R</option><option>SB</option><option>TB</option>
+      </select>
+      <label>Tier:</label>
+      <select id="props-filter-tier" onchange="renderPropsTab()">
+        <option value="">All Tiers</option>
+        <option>ELITE</option><option>STRONG</option><option>LEAN</option><option>SKIP</option>
+      </select>
+      <button class="f-chip active" onclick="clearPropsFilters()">✕ Clear</button>
+      <span id="props-count" style="margin-left:auto;font-size:11px;color:var(--text3);"></span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="data-tbl" id="props-table">
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortProps('player')">Player <span id="sort-ind-player"></span></th>
+            <th class="sortable" onclick="sortProps('team')">Team <span id="sort-ind-team"></span></th>
+            <th class="sortable" onclick="sortProps('propType')">Prop <span id="sort-ind-propType"></span></th>
+            <th class="sortable" onclick="sortProps('line')">Line <span id="sort-ind-line"></span></th>
+            <th class="sortable" onclick="sortProps('projection')">Proj <span id="sort-ind-projection"></span></th>
+            <th class="sortable sort-col" onclick="sortProps('edge')">Edge% <span id="sort-ind-edge">▼</span></th>
+            <th>Tier</th>
+            <th>Book</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="props-tbody">
+          <tr><td colspan="9" class="tbl-empty">Load data or add picks manually below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Manual Prop Entry -->
+  <div class="card">
+    <div class="card-hdr"><span>➕</span><h3>Add Manual Prop</h3></div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <div class="form-row"><label>Player Name</label><input type="text" id="mp-player" placeholder="e.g. Freddie Freeman"></div>
+          <div class="form-row"><label>Team</label>
+            <select id="mp-team-sel" style="flex:1;" onchange="document.getElementById('mp-team').value=this.value"><option value="">— Pick —</option></select>
+            <input type="text" id="mp-team" placeholder="LAD" style="max-width:60px;">
+          </div>
+          <div class="form-row"><label>Prop Type</label>
+            <select id="mp-type">
+              <option value="K">K (Strikeouts)</option>
+              <option value="H">H (Hits)</option>
+              <option value="HR">HR (Home Runs)</option>
+              <option value="RBI">RBI</option>
+              <option value="R">R (Runs)</option>
+              <option value="SB">SB (Stolen Bases)</option>
+              <option value="TB">TB (Total Bases)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="form-row"><label>Line (O/U)</label><input type="number" id="mp-line" placeholder="1.5" step="0.5"></div>
+          <div class="form-row"><label>Projection</label><input type="number" id="mp-proj" placeholder="2.1" step="0.1"></div>
+          <div class="form-row"><label>Odds (DK)</label><input type="number" id="mp-odds" placeholder="-115" step="5"></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addManualProp()">➕ Add Prop</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAllPicks()" style="margin-left:8px;">🗑️ Clear All</button>
+      <div id="manual-prop-status" class="status-box"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── TOP PICKS ──────────────────────────────────────────── -->
+<div id="tab-picks" class="tab-panel">
+  <div class="card" style="overflow:visible;">
+    <div class="filter-bar">
+      <label>Show:</label>
+      <button class="f-chip active" id="picks-f-all" onclick="setPicksFilter('all')">All</button>
+      <button class="f-chip" id="picks-f-elite" onclick="setPicksFilter('ELITE')">⚡ ELITE</button>
+      <button class="f-chip" id="picks-f-strong" onclick="setPicksFilter('STRONG')">💪 STRONG</button>
+      <button class="f-chip" id="picks-f-lean" onclick="setPicksFilter('LEAN')">📌 LEAN</button>
+      <span id="picks-count" style="margin-left:auto;font-size:11px;color:var(--text3);"></span>
+    </div>
+    <div class="card-body" style="padding-top:0;">
+      <div id="picks-grid" class="pick-grid">
+        <div class="tbl-empty" style="grid-column:1/-1;">Load data or add manual props to see picks here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PARLAYS ────────────────────────────────────────────── -->
+<div id="tab-parlays" class="tab-panel">
+  <div class="grid-2">
+    <!-- Custom parlay builder -->
+    <div>
+      <div class="card">
+        <div class="card-hdr">
+          <span>🔗</span><h3>My Parlay</h3>
+          <span id="my-parlay-odds" style="margin-left:auto;font-size:13px;font-weight:800;color:var(--green);"></span>
+        </div>
+        <div class="card-body">
+          <div id="my-parlay-legs">
+            <div class="parlay-empty">Add picks from the Top Picks tab using the "＋ Parlay" button.</div>
+          </div>
+          <div id="my-parlay-total" style="margin-top:10px;display:none;">
+            <div class="sep" style="margin:8px 0;"></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;">
+              <span style="color:var(--text2);">Combined Odds</span>
+              <span id="my-parlay-combined" style="color:var(--green);font-size:15px;font-weight:800;"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px;">
+              <span style="color:var(--text3);">Implied Win%</span>
+              <span id="my-parlay-implied" style="color:var(--text2);"></span>
+            </div>
+            <button class="btn btn-red btn-sm" onclick="clearParlayLegs()" style="margin-top:10px;">🗑️ Clear Parlay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auto-built combos -->
+    <div>
+      <div class="card">
+        <div class="card-hdr"><span>⚡</span><h3>Auto-Built Combos</h3></div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Best 2-leg and 3-leg parlays from ELITE + STRONG picks, sorted by edge confidence.</p>
+          <div id="auto-parlays">
+            <div class="parlay-empty">Load picks to auto-build parlays.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RUN LINE ───────────────────────────────────────────── -->
+<div id="tab-runline" class="tab-panel">
+  <div id="runline-no-data" class="card">
+    <div class="card-body">
+      <div class="no-data-notice">ℹ️ Load game data or add a manual game from the Matchup tab to see run line projections.</div>
+    </div>
+  </div>
+  <div id="runline-content" style="display:none;">
+    <div id="runline-cards"></div>
+  </div>
+</div>
+
+<!-- ── METRICS ────────────────────────────────────────────── -->
+<div id="tab-metrics" class="tab-panel">
+  <div class="card">
+    <div class="card-hdr"><span>📐</span><h3>Player Metrics</h3>
+      <div class="metrics-toggle" style="margin-left:auto;">
+        <button id="btn-batter" class="active" onclick="switchMetrics('batter')">🏏 Batters</button>
+        <button id="btn-pitcher" onclick="switchMetrics('pitcher')">⚾ Pitchers</button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <label>Team:</label>
+      <select id="metrics-filter-team" onchange="renderMetricsTab()"><option value="">All Teams</option></select>
+      <input type="text" id="metrics-search" placeholder="Search player…" style="max-width:180px;" oninput="renderMetricsTab()">
+      <span id="metrics-count" style="margin-left:auto;font-size:11px;color:var(--text3);"></span>
+    </div>
+    <!-- Batter table -->
+    <div id="metrics-batter-wrap" class="tbl-wrap">
+      <table class="data-tbl">
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortMetrics('player')">Player <span id="ms-ind-player"></span></th>
+            <th class="sortable" onclick="sortMetrics('team')">Team <span id="ms-ind-team"></span></th>
+            <th class="sortable" onclick="sortMetrics('avg')">AVG <span id="ms-ind-avg"></span></th>
+            <th class="sortable" onclick="sortMetrics('obp')">OBP <span id="ms-ind-obp"></span></th>
+            <th class="sortable" onclick="sortMetrics('slg')">SLG <span id="ms-ind-slg"></span></th>
+            <th class="sortable" onclick="sortMetrics('hr')">HR <span id="ms-ind-hr"></span></th>
+            <th class="sortable" onclick="sortMetrics('rbi')">RBI <span id="ms-ind-rbi"></span></th>
+            <th class="sortable" onclick="sortMetrics('exitVelo')">Exit Velo <span id="ms-ind-exitVelo"></span></th>
+            <th class="sortable" onclick="sortMetrics('barrelRate')">Barrel% <span id="ms-ind-barrelRate"></span></th>
+          </tr>
+        </thead>
+        <tbody id="batter-tbody">
+          <tr><td colspan="9" class="tbl-empty">Load data to populate batter metrics.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pitcher table -->
+    <div id="metrics-pitcher-wrap" class="tbl-wrap" style="display:none;">
+      <table class="data-tbl">
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortMetrics('player')">Player <span id="mp-ind-player"></span></th>
+            <th class="sortable" onclick="sortMetrics('team')">Team <span id="mp-ind-team"></span></th>
+            <th class="sortable" onclick="sortMetrics('era')">ERA <span id="mp-ind-era">▲</span></th>
+            <th class="sortable" onclick="sortMetrics('whip')">WHIP <span id="mp-ind-whip"></span></th>
+            <th class="sortable" onclick="sortMetrics('kRate')">K% <span id="mp-ind-kRate"></span></th>
+            <th class="sortable" onclick="sortMetrics('bbRate')">BB% <span id="mp-ind-bbRate"></span></th>
+            <th class="sortable" onclick="sortMetrics('xfip')">xFIP <span id="mp-ind-xfip"></span></th>
+            <th class="sortable" onclick="sortMetrics('ip')">IP <span id="mp-ind-ip"></span></th>
+          </tr>
+        </thead>
+        <tbody id="pitcher-tbody">
+          <tr><td colspan="8" class="tbl-empty">Load data to populate pitcher metrics.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODEL LAB (Stage 3) ────────────────────────────────── -->
+<div id="tab-lab" class="tab-panel">
+
+  <!-- Section nav -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-body" style="padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.5px;margin-right:4px;">SECTION:</span>
+      <button class="btn btn-outline btn-sm lab-nav active" data-sec="backtest" onclick="labShowSection('backtest')">📊 Props Backtest</button>
+      <button class="btn btn-outline btn-sm lab-nav" data-sec="calibration" onclick="labShowSection('calibration')">🎯 Tier Calibration</button>
+      <button class="btn btn-outline btn-sm lab-nav" data-sec="tracker" onclick="labShowSection('tracker')">📋 Season Tracker</button>
+      <button class="btn btn-outline btn-sm lab-nav" data-sec="weights" onclick="labShowSection('weights')">⚙️ Model Weights</button>
+    </div>
+  </div>
+
+  <!-- ── PROPS BACKTEST ─────────────────────────────────────────── -->
+  <div id="lab-sec-backtest" class="lab-section">
+    <div class="card">
+      <div class="card-hdr"><span>📊</span><h3>Props Backtest — Upload Results</h3></div>
+      <div class="card-body">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Upload a CSV with your actual game results to grade past picks. Required columns: <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;">date, player, propType, line, side, actual</code></p>
+        <div class="form-row">
+          <label>Results CSV</label>
+          <input type="file" id="lab-bt-file" accept=".csv" onchange="labUploadBacktest(this)"
+            style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;">
+        </div>
+        <div class="form-row">
+          <label>Or paste CSV</label>
+          <textarea id="lab-bt-paste" rows="4" placeholder="date,player,propType,line,side,actual&#10;2026-10-10,J. Ramirez,K,6.5,over,8&#10;2026-10-10,G. Cole,H,6.5,under,4"
+            style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-family:monospace;resize:vertical;outline:none;"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="labGradeBacktest()">⚡ Grade Picks</button>
+          <button class="btn btn-outline btn-sm" onclick="labClearBt()">🗑 Clear</button>
+          <button class="btn btn-outline btn-sm" id="lab-bt-export-btn" onclick="labExportBt()" style="display:none;">⬇️ Export Graded CSV</button>
+        </div>
+        <div id="lab-bt-status" class="status-box"></div>
+      </div>
+    </div>
+
+    <div id="lab-bt-summary-card" class="card" style="display:none;">
+      <div class="card-hdr"><span>📈</span><h3>Backtest Summary</h3></div>
+      <div class="card-body">
+        <div id="lab-bt-summary-tiles" class="grid-3" style="margin-bottom:14px;"></div>
+        <div id="lab-bt-by-type" style="margin-bottom:14px;"></div>
+        <div id="lab-bt-by-tier" style="margin-bottom:14px;"></div>
+      </div>
+    </div>
+
+    <div id="lab-bt-table-card" class="card" style="display:none;">
+      <div class="card-hdr"><span>📋</span><h3>Graded Picks Log</h3>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <select id="lab-bt-filter-type" onchange="labRenderBtTable()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;">
+            <option value="">All Prop Types</option>
+            <option value="K">K (Pitcher Strikeouts)</option>
+            <option value="HR">HR (Home Runs)</option>
+            <option value="H">H (Hits)</option>
+            <option value="RBI">RBI</option>
+            <option value="R">R (Runs)</option>
+            <option value="TB">TB (Total Bases)</option>
+            <option value="BB">BB (Walks)</option>
+          </select>
+          <select id="lab-bt-filter-result" onchange="labRenderBtTable()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;">
+            <option value="">All Results</option>
+            <option value="WIN">Wins</option>
+            <option value="LOSS">Losses</option>
+            <option value="PUSH">Pushes</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto;">
+        <table id="lab-bt-table" style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:var(--bg3);">
+              <th style="padding:8px 10px;text-align:left;color:var(--text3);font-weight:700;letter-spacing:0.4px;">DATE</th>
+              <th style="padding:8px 10px;text-align:left;color:var(--text3);font-weight:700;">PLAYER</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">TYPE</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">LINE</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">SIDE</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">PROJ</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">EDGE%</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">TIER</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">ACTUAL</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">RESULT</th>
+            </tr>
+          </thead>
+          <tbody id="lab-bt-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /backtest -->
+
+  <!-- ── TIER CALIBRATION ───────────────────────────────────────── -->
+  <div id="lab-sec-calibration" class="lab-section" style="display:none;">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hdr"><span>🎯</span><h3>Tier Thresholds</h3></div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Adjust the minimum edge% required for each tier. Changes apply to the current session and can be saved to GitHub.</p>
+          <div class="form-row">
+            <label>🔴 ELITE min edge%</label>
+            <input type="number" id="lab-cal-elite" value="8" min="0" max="50" step="0.5" style="max-width:80px;" oninput="labPreviewCalibration()">
+            <span style="font-size:11px;color:var(--text3);" id="lab-cal-elite-count">— picks</span>
+          </div>
+          <div class="form-row">
+            <label>🟡 STRONG min edge%</label>
+            <input type="number" id="lab-cal-strong" value="4" min="0" max="50" step="0.5" style="max-width:80px;" oninput="labPreviewCalibration()">
+            <span style="font-size:11px;color:var(--text3);" id="lab-cal-strong-count">— picks</span>
+          </div>
+          <div class="form-row">
+            <label>🔵 LEAN min edge%</label>
+            <input type="number" id="lab-cal-lean" value="1" min="0" max="20" step="0.5" style="max-width:80px;" oninput="labPreviewCalibration()">
+            <span style="font-size:11px;color:var(--text3);" id="lab-cal-lean-count">— picks</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <button class="btn btn-primary" onclick="labApplyCalibration()">✅ Apply to Session</button>
+            <button class="btn btn-outline btn-sm" onclick="labResetCalibration()">↺ Reset to Defaults</button>
+          </div>
+          <div id="lab-cal-status" class="status-box"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><span>☁️</span><h3>GitHub Calibration Sync</h3></div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Save calibration to your GitHub repo so it auto-loads when the model opens. Uses the same PAT and repo set in the Data tab.</p>
+          <div class="form-row">
+            <label>Calibration File</label>
+            <input type="text" id="lab-cal-file" placeholder="mlb_calibration.json" style="max-width:200px;">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="labPushCalibration()">⬆️ Push to GitHub</button>
+            <button class="btn btn-outline btn-sm" onclick="labPullCalibration()">⬇️ Pull from GitHub</button>
+          </div>
+          <div id="lab-cal-gh-status" class="status-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><span>📊</span><h3>Current Tier Distribution</h3>
+        <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="labRenderCalibration()">🔄 Refresh</button>
+      </div>
+      <div class="card-body">
+        <div id="lab-cal-dist" style="min-height:80px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <span style="color:var(--text3);font-size:12px;">Load data and click Refresh to see tier distribution.</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /calibration -->
+
+  <!-- ── SEASON TRACKER ─────────────────────────────────────────── -->
+  <div id="lab-sec-tracker" class="lab-section" style="display:none;">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hdr"><span>➕</span><h3>Log a Pick Result</h3></div>
+        <div class="card-body">
+          <div class="form-row"><label>Date</label><input type="date" id="lab-tr-date" style="max-width:160px;"></div>
+          <div class="form-row"><label>Player</label><input type="text" id="lab-tr-player" placeholder="e.g. J. Ramirez"></div>
+          <div class="form-row">
+            <label>Prop Type</label>
+            <select id="lab-tr-type" style="flex:1;">
+              <option value="K">K — Pitcher Strikeouts</option>
+              <option value="HR">HR — Home Runs</option>
+              <option value="H">H — Hits</option>
+              <option value="RBI">RBI</option>
+              <option value="R">R — Runs Scored</option>
+              <option value="TB">TB — Total Bases</option>
+              <option value="BB">BB — Walks</option>
+              <option value="H-Allowed">H-Allowed</option>
+              <option value="ER">ER</option>
+              <option value="OUTS">OUTS</option>
+            </select>
+          </div>
+          <div class="form-row"><label>Line</label><input type="number" id="lab-tr-line" placeholder="6.5" step="0.5" style="max-width:100px;"></div>
+          <div class="form-row">
+            <label>Your Pick</label>
+            <select id="lab-tr-side" style="max-width:120px;">
+              <option value="over">Over</option>
+              <option value="under">Under</option>
+            </select>
+          </div>
+          <div class="form-row"><label>Actual Value</label><input type="number" id="lab-tr-actual" placeholder="e.g. 7" step="0.5" style="max-width:100px;"></div>
+          <div class="form-row"><label>Tier</label>
+            <select id="lab-tr-tier" style="max-width:120px;">
+              <option value="ELITE">ELITE</option>
+              <option value="STRONG">STRONG</option>
+              <option value="LEAN">LEAN</option>
+              <option value="SKIP">SKIP</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="labLogPick()">➕ Log Pick</button>
+          <div id="lab-tr-log-status" class="status-box"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><span>📈</span><h3>Season Summary</h3>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <button class="btn btn-outline btn-sm" onclick="labRenderTracker()">🔄 Refresh</button>
+            <button class="btn btn-outline btn-sm" onclick="labExportTracker()">⬇️ CSV</button>
+            <button class="btn btn-red btn-sm" onclick="labClearTracker()">🗑 Clear All</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="lab-tr-summary" style="min-height:100px;">
+            <span style="color:var(--text3);font-size:12px;">No picks logged yet. Use the form to track results.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><span>📋</span><h3>Pick History</h3>
+        <div style="margin-left:auto;">
+          <select id="lab-tr-filter" onchange="labRenderTrackerTable()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;">
+            <option value="">All Types</option>
+            <option value="K">K</option><option value="HR">HR</option><option value="H">H</option>
+            <option value="RBI">RBI</option><option value="R">R</option><option value="TB">TB</option>
+            <option value="BB">BB</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:var(--bg3);">
+              <th style="padding:8px 10px;text-align:left;color:var(--text3);font-weight:700;">DATE</th>
+              <th style="padding:8px 10px;text-align:left;color:var(--text3);font-weight:700;">PLAYER</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">TYPE</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">LINE</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">PICK</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">TIER</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">ACTUAL</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;">RESULT</th>
+              <th style="padding:8px 10px;text-align:center;color:var(--text3);font-weight:700;"></th>
+            </tr>
+          </thead>
+          <tbody id="lab-tr-tbody"></tbody>
+        </table>
+        <div id="lab-tr-empty" style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">No picks logged yet.</div>
+      </div>
+    </div>
+  </div><!-- /tracker -->
+
+  <!-- ── MODEL WEIGHTS ──────────────────────────────────────────── -->
+  <div id="lab-sec-weights" class="lab-section" style="display:none;">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hdr"><span>⚙️</span><h3>Projection Blend</h3></div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Control how much the model leans on raw BigDataBall stats vs the book's opening line when building projections.</p>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:600;color:var(--text);">Stats ↔ Line Blend</span>
+              <span id="lab-w-blend-val" style="font-size:12px;font-weight:700;color:var(--gold);">50% Stats / 50% Line</span>
+            </div>
+            <input type="range" id="lab-w-blend" min="0" max="100" value="50" step="5"
+              style="width:100%;accent-color:var(--gold);" oninput="labUpdateWeightLabels()">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px;">
+              <span>Pure Stats</span><span>Pure Line</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:600;color:var(--text);">Park Factor Influence</span>
+              <span id="lab-w-park-val" style="font-size:12px;font-weight:700;color:var(--gold);">1.0×</span>
+            </div>
+            <input type="range" id="lab-w-park" min="0" max="200" value="100" step="10"
+              style="width:100%;accent-color:var(--gold);" oninput="labUpdateWeightLabels()">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px;">
+              <span>Off (0×)</span><span>Full (2×)</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:600;color:var(--text);">Pitcher Quality Weight</span>
+              <span id="lab-w-pitcher-val" style="font-size:12px;font-weight:700;color:var(--gold);">1.0×</span>
+            </div>
+            <input type="range" id="lab-w-pitcher" min="0" max="200" value="100" step="10"
+              style="width:100%;accent-color:var(--gold);" oninput="labUpdateWeightLabels()">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px;">
+              <span>Ignore pitcher stats</span><span>Double pitcher weight</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:600;color:var(--text);">Edge Boost — Recent Form (L10)</span>
+              <span id="lab-w-form-val" style="font-size:12px;font-weight:700;color:var(--gold);">1.0×</span>
+            </div>
+            <input type="range" id="lab-w-form" min="0" max="200" value="100" step="10"
+              style="width:100%;accent-color:var(--gold);" oninput="labUpdateWeightLabels()">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px;">
+              <span>Season avg only</span><span>Heavy L10 weight</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="labSaveWeights()">💾 Save Weights</button>
+            <button class="btn btn-outline btn-sm" onclick="labResetWeights()">↺ Reset Defaults</button>
+          </div>
+          <div id="lab-w-status" class="status-box"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><span>📊</span><h3>Active Weight Summary</h3></div>
+        <div class="card-body">
+          <div id="lab-w-preview" style="min-height:120px;">
+            <div style="color:var(--text3);font-size:12px;margin-bottom:14px;">Adjust sliders to preview how weight changes affect the current prop pool.</div>
+            <div id="lab-w-impact-rows"></div>
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-weight:700;letter-spacing:0.4px;">SAVED WEIGHTS</div>
+            <div id="lab-w-saved-display" style="font-size:12px;color:var(--text2);">No weights saved yet — defaults active.</div>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary btn-sm" onclick="labPreviewWeightImpact()">🔍 Preview Impact on Props</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /weights -->
+
+</div><!-- /tab-lab -->
+
+<!-- ================================================================
+     DATA TAB (unchanged from v1.1)
+     ================================================================ -->
+<div id="tab-data" class="tab-panel">
+  <div class="card">
+    <div class="card-hdr">
+      <span>🔑</span><h3>API Keys</h3>
+      <button class="btn btn-green btn-sm" onclick="dcTestAllKeys()" style="margin-left:auto;">⚡ Test All Keys</button>
+    </div>
+    <div class="card-body">
+      <div id="all-keys-status" class="status-box" style="margin-bottom:12px;"></div>
+      <div class="sec-hdr">📡 Odds API</div>
+      <div class="form-row">
+        <label>Odds API Key</label>
+        <input type="password" id="dc-odds-key" placeholder="Enter Odds API key..." autocomplete="off">
+        <button class="toggle-pw" onclick="togglePw('dc-odds-key')">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="dcTestOdds()">Test</button>
+        <button class="btn btn-primary btn-sm" onclick="dcSaveOdds()">Save</button>
+      </div>
+      <div id="odds-status" class="status-box"></div>
+      <div class="form-row" style="margin-top:8px;">
+        <label>Active Books</label>
+        <select id="dc-books" style="max-width:400px;">
+          <option value="draftkings,fanduel,betmgm,bet365_us,betrivers" selected>DK + FD + BetMGM + Bet365 + BetRivers</option>
+          <option value="draftkings,fanduel,betmgm">DK + FD + BetMGM (3-book)</option>
+          <option value="draftkings,fanduel">DK + FD only</option>
+        </select>
+        <small>DraftKings is primary — fills gaps in order</small>
+      </div>
+      <div class="sep"></div>
+      <div class="sec-hdr">⚾ MLB Data Sources</div>
+      <div class="form-row">
+        <label>BigBall API Key</label>
+        <input type="password" id="dc-bigball-key" placeholder="Enter BigBall Sports Data key..." autocomplete="off">
+        <button class="toggle-pw" onclick="togglePw('dc-bigball-key')">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="dcTestBigBall()">Test</button>
+        <button class="btn btn-primary btn-sm" onclick="dcSaveBigBall()">Save</button>
+      </div>
+      <div id="bigball-status" class="status-box"></div>
+      <div style="margin-top:8px;padding:8px 12px;background:var(--bg3);border-radius:6px;border:1px solid var(--border);font-size:11px;color:var(--text2);">
+        ℹ️ <strong style="color:var(--text);">MLB Stats API</strong> and <strong style="color:var(--text);">Baseball Savant</strong> are fetched directly — no key required.
+      </div>
+      <div class="sep"></div>
+      <div class="sec-hdr">🎬 HeyGen Video</div>
+      <div class="form-row">
+        <label>HeyGen API Key</label>
+        <input type="password" id="dc-heygen-key" placeholder="Enter HeyGen API key..." autocomplete="off">
+        <button class="toggle-pw" onclick="togglePw('dc-heygen-key')">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="dcTestHeyGen()">Test</button>
+        <button class="btn btn-primary btn-sm" onclick="dcSaveHeyGen()">Save</button>
+      </div>
+      <div id="heygen-status" class="status-box"></div>
+      <div class="form-row">
+        <label>Avatar ID</label>
+        <input type="text" id="dc-heygen-avatar" placeholder="80db54974836409aaea93ba47f1ffcc7">
+        <button class="btn btn-primary btn-sm" onclick="dcSaveHeyGenMeta()">Save</button>
+      </div>
+      <div class="form-row"><label>Voice ID</label><input type="text" id="dc-heygen-voice" placeholder="e49bc60d28a94161af86c50c7d19a03c"></div>
+      <div class="form-row"><label>Intro Template ID</label><input type="text" id="dc-heygen-intro" placeholder="f45cf2139afe44d2bdf9abe9a1e1e44a"></div>
+      <div class="form-row"><label>Short Template ID</label><input type="text" id="dc-heygen-short" placeholder="9378f12ef1f14b11b435be56c6faf89f"></div>
+      <div class="sep"></div>
+      <div class="sec-hdr">💬 Discord</div>
+      <div class="form-row">
+        <label>Webhook URL</label>
+        <input type="password" id="dc-discord-webhook" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
+        <button class="toggle-pw" onclick="togglePw('dc-discord-webhook')">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="dcTestDiscord()">Test</button>
+        <button class="btn btn-primary btn-sm" onclick="dcSaveDiscord()">Save</button>
+      </div>
+      <div id="discord-status" class="status-box"></div>
+      <div class="sep"></div>
+      <div class="sec-hdr">🐙 GitHub Data Pull</div>
+      <div class="form-row">
+        <label>GitHub PAT</label>
+        <input type="password" id="dc-github-pat" placeholder="ghp_..." autocomplete="off">
+        <button class="toggle-pw" onclick="togglePw('dc-github-pat')">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="dcTestGitHub()">Test</button>
+        <button class="btn btn-primary btn-sm" onclick="dcSaveGitHub()">Save</button>
+      </div>
+      <div id="github-status" class="status-box"></div>
+      <div class="form-row">
+        <label>GitHub Repo</label>
+        <input type="text" id="dc-github-repo" placeholder="Gatorz1989/MLB_Data_Pull">
+        <button class="btn btn-primary btn-sm" onclick="dcSaveGitHub()">Save</button>
+      </div>
+      <div class="form-row">
+        <label>Kit API Key</label>
+        <input type="password" id="dc-kit-key" placeholder="Enter Kit (formerly ConvertKit) key..." autocomplete="off">
+        <button class="toggle-pw" onclick="togglePw('dc-kit-key')">👁</button>
+        <button class="btn btn-primary btn-sm" onclick="dcSaveKit()">Save</button>
+      </div>
+      <div class="sep"></div>
+      <div id="all-keys-summary" style="display:none;">
+        <div class="sec-hdr">🔍 Key Status Summary</div>
+        <div id="key-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span>☁️</span><h3>Load Weekly Data</h3></div>
+    <div class="card-body">
+      <div class="form-row">
+        <label>Slate Date</label>
+        <input type="date" id="dc-slate-date" style="max-width:180px;">
+        <button class="btn btn-primary" onclick="dcLoadCloud()">
+          <span id="cloud-load-icon">☁️</span> Load from GitHub
+        </button>
+      </div>
+      <div id="cloud-load-status" class="status-box"></div>
+      <div class="form-row" style="margin-top:8px;">
+        <label>Data File</label>
+        <input type="text" id="dc-github-file" placeholder="mlb_edge_data.json" style="max-width:220px;">
+        <button class="btn btn-primary btn-sm" onclick="dcSaveGitHub()">Save</button>
+      </div>
+      <div class="form-row" style="margin-top:4px;align-items:center;gap:10px;">
+        <label>Auto-Load on Open</label>
+        <input type="checkbox" id="dc-auto-load" onchange="dcToggleAutoLoad(this)"
+          style="width:18px;height:18px;accent-color:var(--gold);cursor:pointer;">
+        <span id="auto-load-label" style="font-size:12px;color:var(--text3);">Off — opens without fetching data</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3);">
+        Fetches <code style="background:var(--bg4);padding:1px 5px;border-radius:3px;">mlb_edge_data.json</code>
+        from your GitHub repo on open. Run <code style="background:var(--bg4);padding:1px 5px;border-radius:3px;">mlb_edge_data_pull.py --push</code> first.
+      </div>
+      <div class="sep"></div>
+      <div class="sec-hdr">📁 Upload Data File</div>
+      <div class="form-row">
+        <label>JSON File</label>
+        <input type="file" id="dc-json-upload" accept=".json" onchange="dcUploadJSON(this)"
+          style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:6px;border-radius:6px;flex:1;">
+      </div>
+      <div id="json-upload-status" class="status-box"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span>📋</span><h3>Data Summary</h3></div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <div class="stat-row"><span class="stat-lbl">Teams Loaded</span><span class="stat-val" id="ds-teams">—</span></div>
+          <div class="stat-row"><span class="stat-lbl">Today's Games</span><span class="stat-val" id="ds-games">—</span></div>
+          <div class="stat-row"><span class="stat-lbl">Batters</span><span class="stat-val" id="ds-batters">—</span></div>
+          <div class="stat-row"><span class="stat-lbl">Pitchers</span><span class="stat-val" id="ds-pitchers">—</span></div>
+        </div>
+        <div>
+          <div class="stat-row"><span class="stat-lbl">Prop Lines Loaded</span><span class="stat-val" id="ds-props">—</span></div>
+          <div class="stat-row"><span class="stat-lbl">Season Phase</span><span class="stat-val" id="ds-phase">—</span></div>
+          <div class="stat-row"><span class="stat-lbl">Data Source</span><span class="stat-val" id="ds-source">—</span></div>
+          <div class="stat-row"><span class="stat-lbl">Last Pull</span><span class="stat-val" id="ds-pull-time">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-data -->
+
+<!-- ================================================================
+     EXPORT TAB — Steps 1-2 same, Steps 3-5 LIVE
+     ================================================================ -->
+<div id="tab-export" class="tab-panel">
+
+  <div style="background:rgba(57,211,83,0.08);border:1px solid rgba(57,211,83,0.3);border-radius:8px;
+    padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--green);">
+    ✅ <strong>Stage 2 Export</strong> — Thumbnail builder, HeyGen video generation, and slideshow creator are all live.
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="export-step">
+    <div class="export-step-hdr">
+      <div class="step-num">1</div><h4>Select Sharpest Edge</h4>
+    </div>
+    <div class="export-step-body">
+      <div class="form-row">
+        <label>Today's #1 Pick</label>
+        <select id="exp-sharp-sel" style="flex:1;"><option value="">— Fetch data first —</option></select>
+        <button class="btn btn-primary btn-sm" onclick="expLockSharp()">🔒 Lock</button>
+        <button class="btn btn-outline btn-sm" onclick="expResetSharp()">↺ Reset</button>
+      </div>
+      <div id="exp-sharp-display" style="display:none;margin-top:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">SHARPEST EDGE — TODAY'S #1 PICK</div>
+        <div id="exp-sharp-name" style="font-size:15px;font-weight:700;color:var(--gold);"></div>
+        <div id="exp-sharp-detail" style="font-size:12px;color:var(--text2);margin-top:2px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="export-step">
+    <div class="export-step-hdr">
+      <div class="step-num">2</div><h4>Generate Reports</h4>
+    </div>
+    <div class="export-step-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn btn-primary" onclick="expGenerateReport('free')">📄 Generate Free Report</button>
+        <button class="btn btn-primary" onclick="expGenerateReport('paid')">💎 Generate Paid Report</button>
+      </div>
+      <div id="report-status" class="status-box"></div>
+      <div class="sep"></div>
+      <div class="sec-hdr">📬 Email Delivery (Kit)</div>
+      <div class="form-row"><label>Sender Email</label><input type="text" id="exp-sender" value="picks@youredgereport.com" style="max-width:280px;"></div>
+      <div class="form-row">
+        <label>Session Passphrase</label>
+        <input type="password" id="exp-passphrase" placeholder="Enter for this session...">
+        <button class="toggle-pw" onclick="togglePw('exp-passphrase')">👁</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <button class="btn btn-outline btn-sm" onclick="expSendFree()">📤 Send Free Report</button>
+        <button class="btn btn-outline btn-sm" onclick="expSendPaid()">📤 Send Paid Report</button>
+      </div>
+      <div id="email-status" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Thumbnail (LIVE) -->
+  <div class="export-step">
+    <div class="export-step-hdr">
+      <div class="step-num">3</div><h4>Generate Thumbnail</h4>
+      <span class="hdr-chip chip-ok" style="margin-left:auto;font-size:9px;">LIVE</span>
+    </div>
+    <div class="export-step-body">
+      <div class="form-row"><label>Headline Text</label>
+        <input type="text" id="thumb-headline" placeholder="Auto-fills from top pick — or type custom text">
+      </div>
+      <div class="form-row"><label>Slate Date</label>
+        <input type="text" id="thumb-date" placeholder="Auto — or override e.g. Oct 15 ALCS">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn btn-primary" onclick="generateThumbnail()">🖼️ Generate Thumbnail</button>
+        <button class="btn btn-green" onclick="downloadThumb()">⬇️ Download 1280×720 PNG</button>
+      </div>
+      <div class="thumb-wrap">
+        <canvas id="thumb-preview"></canvas>
+        <canvas id="thumb-canvas" style="display:none;"></canvas>
+      </div>
+      <div id="thumb-status" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- STEP 4: HeyGen (LIVE) -->
+  <div class="export-step">
+    <div class="export-step-hdr">
+      <div class="step-num">4</div><h4>Create HeyGen Videos</h4>
+      <span class="hdr-chip chip-ok" style="margin-left:auto;font-size:9px;">LIVE</span>
+    </div>
+    <div class="export-step-body">
+      <div style="margin-bottom:10px;">
+        <button class="btn btn-outline btn-sm" onclick="heyGenBuildScript()">📝 Auto-Build Script</button>
+        <span style="font-size:11px;color:var(--text3);margin-left:8px;">from top ELITE + STRONG picks</span>
+      </div>
+      <textarea class="script-box" id="heygen-script" rows="8" placeholder="Script will auto-build from picks, or type your own here..."></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn btn-primary" onclick="heyGenGenerate('intro')">🎬 Generate Intro (16:9)</button>
+        <button class="btn btn-primary" onclick="heyGenGenerate('short')">📱 Generate Short (9:16)</button>
+        <button class="btn btn-outline" onclick="heyGenGenerate('preroll')">📺 Generate Pre-Roll</button>
+      </div>
+      <div id="heygen-gen-status" class="status-box"></div>
+      <div style="margin-top:10px;padding:8px;background:var(--bg3);border-radius:6px;font-size:11px;color:var(--text3);">
+        Requires HeyGen API key and template IDs configured in the Data tab.
+        Video generation typically takes 2–5 minutes — check your HeyGen dashboard for status.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: Slideshow (LIVE) -->
+  <div class="export-step">
+    <div class="export-step-hdr">
+      <div class="step-num">5</div><h4>Build YouTube Slideshow</h4>
+      <span class="hdr-chip chip-ok" style="margin-left:auto;font-size:9px;">LIVE</span>
+    </div>
+    <div class="export-step-body">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
+        Generates a self-contained HTML slide deck from your picks — one slide per ELITE play,
+        summary slide for STRONG plays, branded title and disclaimer slides.
+        Press F11 for fullscreen after opening.
+      </p>
+      <div class="form-row"><label>Title Override</label>
+        <input type="text" id="ss-title" placeholder="Auto: The Edge Report — MLB Picks — [date]">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="buildSlideshow()">📊 Build &amp; Open Slideshow</button>
+        <button class="btn btn-outline btn-sm" onclick="downloadSlideshow()">⬇️ Download HTML</button>
+      </div>
+      <div id="slideshow-status" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- AFFILIATES -->
+  <div class="card">
+    <div class="card-hdr"><span>🤝</span><h3>Affiliate Programs</h3></div>
+    <div class="card-body">
+      <div class="grid-3">
+        <div class="aff-card">
+          <div class="aff-name">DraftKings</div>
+          <div class="aff-code">Code: <span id="aff-dk">—</span></div>
+          <input type="text" id="aff-dk-input" placeholder="Affiliate code..." style="background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:4px;font-size:11px;width:100%;margin-top:4px;">
+          <button class="btn btn-outline btn-sm" onclick="saveAff('dk')" style="margin-top:4px;">Save</button>
+        </div>
+        <div class="aff-card">
+          <div class="aff-name">FanDuel</div>
+          <div class="aff-code">Code: <span id="aff-fd">—</span></div>
+          <input type="text" id="aff-fd-input" placeholder="Affiliate code..." style="background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:4px;font-size:11px;width:100%;margin-top:4px;">
+          <button class="btn btn-outline btn-sm" onclick="saveAff('fd')" style="margin-top:4px;">Save</button>
+        </div>
+        <div class="aff-card">
+          <div class="aff-name">BetMGM</div>
+          <div class="aff-code">Code: <span id="aff-bmgm">—</span></div>
+          <input type="text" id="aff-bmgm-input" placeholder="Affiliate code..." style="background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:4px;font-size:11px;width:100%;margin-top:4px;">
+          <button class="btn btn-outline btn-sm" onclick="saveAff('bmgm')" style="margin-top:4px;">Save</button>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="sec-hdr">💳 Subscription Pricing</div>
+      <div class="grid-2" style="gap:8px;">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">SINGLE SPORT</div>
+          <div style="font-size:14px;font-weight:700;color:var(--gold);">$29.99<span style="font-size:10px;color:var(--text3);font-weight:400;">/mo</span></div>
+          <div style="font-size:11px;color:var(--text2);">$199.99/yr (save 44%)</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">ALL-SPORT</div>
+          <div style="font-size:14px;font-weight:700;color:var(--gold);">$84.99<span style="font-size:10px;color:var(--text3);font-weight:400;">/mo</span></div>
+          <div style="font-size:11px;color:var(--text2);">$599.99/yr (save 41%)</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text3);">
+        QR Code URL: <a href="https://youredgereport.kit.com/" style="color:var(--blue);">youredgereport.kit.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span>⚠️</span><h3>Responsible Gambling Disclaimer</h3></div>
+    <div class="card-body">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;color:var(--text2);line-height:1.6;">
+        <strong style="color:var(--text);">Disclaimer:</strong> The Edge Report provides analytics and model-based projections for entertainment purposes only.
+        Past performance does not guarantee future results. Betting involves risk — never bet more than you can afford to lose.
+        If you or someone you know has a gambling problem, call 1-800-GAMBLER or visit <a href="https://ncpgambling.org" style="color:var(--blue);">ncpgambling.org</a>.
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-export -->
+
+<!-- ================================================================
+     CALENDAR TAB (unchanged from v1.1)
+     ================================================================ -->
+<div id="tab-calendar" class="tab-panel">
+  <div class="card">
+    <div class="card-hdr"><span>📅</span><h3>Task Calendar</h3></div>
+    <div class="card-body">
+      <div id="cal-nav">
+        <button class="btn btn-outline btn-sm" onclick="calShift(-1)">◀ Prev</button>
+        <div id="cal-title">October 2026</div>
+        <button class="btn btn-outline btn-sm" onclick="calShift(1)">Next ▶</button>
+        <button class="btn btn-primary btn-sm" onclick="calToday()" style="margin-left:8px;">Today</button>
+      </div>
+      <div id="cal-grid"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>⚡</span><h3>Upcoming MLB Tasks</h3></div>
+    <div class="card-body"><div id="cal-upcoming"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>🗓️</span><h3>MLB Season Schedule</h3></div>
+    <div class="card-body">
+      <div class="stat-row"><span class="stat-lbl">Wild Card</span><span class="stat-val">Oct 1–3, 2026</span></div>
+      <div class="stat-row"><span class="stat-lbl">Division Series (ALDS/NLDS)</span><span class="stat-val">Oct 7–13, 2026</span></div>
+      <div class="stat-row"><span class="stat-lbl">Championship Series (ALCS/NLCS)</span><span class="stat-val" style="color:var(--green);">Oct 14–21, 2026 ← NOW</span></div>
+      <div class="stat-row"><span class="stat-lbl">World Series</span><span class="stat-val">Oct 25 – Nov 1, 2026</span></div>
+      <div class="stat-row"><span class="stat-lbl">Offseason</span><span class="stat-val">Nov 2026 – Jan 2027</span></div>
+      <div class="stat-row"><span class="stat-lbl">Spring Training</span><span class="stat-val">Feb 2027</span></div>
+      <div class="stat-row"><span class="stat-lbl">Opening Day 2027</span><span class="stat-val">Mar 27, 2027 (est.)</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>➕</span><h3>Add Custom Task</h3></div>
+    <div class="card-body">
+      <div class="form-row"><label>Date</label><input type="date" id="cal-task-date" style="max-width:180px;"></div>
+      <div class="form-row"><label>Task Name</label><input type="text" id="cal-task-name" placeholder="e.g. Update model weights, Upload video..."></div>
+      <div class="form-row">
+        <label>Type</label>
+        <select id="cal-task-type">
+          <option value="pull">📥 Data Pull</option>
+          <option value="report">📄 Report</option>
+          <option value="game">⚾ Game</option>
+          <option value="season">📅 Season Event</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="calAddTask()">➕ Add Task</button>
+      <div id="cal-task-status" class="status-box"></div>
+    </div>
+  </div>
+</div><!-- /tab-calendar -->
+
+</div><!-- /main -->
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────────
+var MLB_EDGE_VERSION = 'v1.3';
+var BK_ORDER = {draftkings:0,fanduel:1,betmgm:2,bet365_us:3,betrivers:3,bet365:3};
+
+// ── STAGE 2 GLOBALS ────────────────────────────────────────────────
+var PICKS_DATA = [];
+var PARLAY_LEGS = [];
+var CURRENT_GAME = null;
+var METRICS_MODE = 'batter';
+var PROPS_SORT = {col:'edge', dir:-1};
+var METRICS_SORT_BATTER = {col:'avg', dir:-1};
+var METRICS_SORT_PITCHER = {col:'era', dir:1};
+var PICKS_FILTER = 'all';
+var _SLIDESHOW_HTML = '';
+var _MANUAL_GAME = null;
+
+// ── MLB TEAMS DB ───────────────────────────────────────────────────
+var MLB_TEAMS = {
+  ARI:{name:'Arizona Diamondbacks',city:'Arizona',abbr:'ARI',league:'NL',division:'NL West',park:'Chase Field',parkFactor:1.04,isIndoor:false},
+  ATL:{name:'Atlanta Braves',city:'Atlanta',abbr:'ATL',league:'NL',division:'NL East',park:'Truist Park',parkFactor:1.03,isIndoor:false},
+  BAL:{name:'Baltimore Orioles',city:'Baltimore',abbr:'BAL',league:'AL',division:'AL East',park:'Oriole Park',parkFactor:1.01,isIndoor:false},
+  BOS:{name:'Boston Red Sox',city:'Boston',abbr:'BOS',league:'AL',division:'AL East',park:'Fenway Park',parkFactor:1.06,isIndoor:false},
+  CHC:{name:'Chicago Cubs',city:'Chicago',abbr:'CHC',league:'NL',division:'NL Central',park:'Wrigley Field',parkFactor:1.05,isIndoor:false},
+  CWS:{name:'Chicago White Sox',city:'Chicago',abbr:'CWS',league:'AL',division:'AL Central',park:'Guaranteed Rate Field',parkFactor:1.02,isIndoor:false},
+  CIN:{name:'Cincinnati Reds',city:'Cincinnati',abbr:'CIN',league:'NL',division:'NL Central',park:'Great American Ball Park',parkFactor:1.07,isIndoor:false},
+  CLE:{name:'Cleveland Guardians',city:'Cleveland',abbr:'CLE',league:'AL',division:'AL Central',park:'Progressive Field',parkFactor:0.98,isIndoor:false},
+  COL:{name:'Colorado Rockies',city:'Colorado',abbr:'COL',league:'NL',division:'NL West',park:'Coors Field',parkFactor:1.15,isIndoor:false},
+  DET:{name:'Detroit Tigers',city:'Detroit',abbr:'DET',league:'AL',division:'AL Central',park:'Comerica Park',parkFactor:0.96,isIndoor:false},
+  HOU:{name:'Houston Astros',city:'Houston',abbr:'HOU',league:'AL',division:'AL West',park:'Minute Maid Park',parkFactor:1.02,isIndoor:false},
+  KC:{name:'Kansas City Royals',city:'Kansas City',abbr:'KC',league:'AL',division:'AL Central',park:'Kauffman Stadium',parkFactor:0.97,isIndoor:false},
+  LAA:{name:'Los Angeles Angels',city:'Los Angeles',abbr:'LAA',league:'AL',division:'AL West',park:'Angel Stadium',parkFactor:1.00,isIndoor:false},
+  LAD:{name:'Los Angeles Dodgers',city:'Los Angeles',abbr:'LAD',league:'NL',division:'NL West',park:'Dodger Stadium',parkFactor:0.99,isIndoor:false},
+  MIA:{name:'Miami Marlins',city:'Miami',abbr:'MIA',league:'NL',division:'NL East',park:'loanDepot Park',parkFactor:0.95,isIndoor:true},
+  MIL:{name:'Milwaukee Brewers',city:'Milwaukee',abbr:'MIL',league:'NL',division:'NL Central',park:'American Family Field',parkFactor:1.00,isIndoor:false},
+  MIN:{name:'Minnesota Twins',city:'Minnesota',abbr:'MIN',league:'AL',division:'AL Central',park:'Target Field',parkFactor:0.99,isIndoor:false},
+  NYM:{name:'New York Mets',city:'New York',abbr:'NYM',league:'NL',division:'NL East',park:'Citi Field',parkFactor:0.97,isIndoor:false},
+  NYY:{name:'New York Yankees',city:'New York',abbr:'NYY',league:'AL',division:'AL East',park:'Yankee Stadium',parkFactor:1.05,isIndoor:false},
+  OAK:{name:'Oakland Athletics',city:'Sacramento',abbr:'OAK',league:'AL',division:'AL West',park:'Sutter Health Park',parkFactor:1.00,isIndoor:false},
+  PHI:{name:'Philadelphia Phillies',city:'Philadelphia',abbr:'PHI',league:'NL',division:'NL East',park:'Citizens Bank Park',parkFactor:1.05,isIndoor:false},
+  PIT:{name:'Pittsburgh Pirates',city:'Pittsburgh',abbr:'PIT',league:'NL',division:'NL Central',park:'PNC Park',parkFactor:1.00,isIndoor:false},
+  SD:{name:'San Diego Padres',city:'San Diego',abbr:'SD',league:'NL',division:'NL West',park:'Petco Park',parkFactor:0.93,isIndoor:false},
+  SF:{name:'San Francisco Giants',city:'San Francisco',abbr:'SF',league:'NL',division:'NL West',park:"Oracle Park",parkFactor:0.94,isIndoor:false},
+  SEA:{name:'Seattle Mariners',city:'Seattle',abbr:'SEA',league:'AL',division:'AL West',park:'T-Mobile Park',parkFactor:0.97,isIndoor:true},
+  STL:{name:'St. Louis Cardinals',city:'St. Louis',abbr:'STL',league:'NL',division:'NL Central',park:'Busch Stadium',parkFactor:0.99,isIndoor:false},
+  TB:{name:'Tampa Bay Rays',city:'Tampa Bay',abbr:'TB',league:'AL',division:'AL East',park:'Tropicana Field',parkFactor:0.97,isIndoor:true},
+  TEX:{name:'Texas Rangers',city:'Texas',abbr:'TEX',league:'AL',division:'AL West',park:'Globe Life Field',parkFactor:1.01,isIndoor:true},
+  TOR:{name:'Toronto Blue Jays',city:'Toronto',abbr:'TOR',league:'AL',division:'AL East',park:'Rogers Centre',parkFactor:1.03,isIndoor:true},
+  WSH:{name:'Washington Nationals',city:'Washington',abbr:'WSH',league:'NL',division:'NL East',park:'Nationals Park',parkFactor:1.00,isIndoor:false}
+};
+
+// ── MODEL DATA STORE ───────────────────────────────────────────────
+var MODEL_DATA = {
+  loaded:false, source:null, pullTime:null,
+  games:[], batters:[], pitchers:[], props:[],
+  seasonPhase:'postseason'
+};
+
+// ── SEASON PHASE ───────────────────────────────────────────────────
+function detectSeasonPhase() {
+  var now = new Date(), m = now.getMonth()+1, d = now.getDate(), y = now.getFullYear();
+  if (y===2026) {
+    if (m===10 && d>=1 && d<=24) return 'postseason';
+    if (m>=11 || (m===10 && d>24)) return 'offseason';
+    if (m===2 || m===3) return 'spring';
+    if ((m===3 && d>=28) || (m>=4 && m<=9)) return 'regular';
+  }
+  return 'offseason';
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  var now = new Date();
+  document.getElementById('hdr-date').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  var phase = detectSeasonPhase();
+  MODEL_DATA.seasonPhase = phase;
+  var phaseLabels = {postseason:'⚾ POSTSEASON',regular:'⚾ REGULAR SEASON',spring:'🌱 SPRING TRAINING',offseason:'❄️ OFFSEASON'};
+  document.getElementById('hdr-sport').textContent = phaseLabels[phase] || '⚾ MLB';
+  document.getElementById('ds-phase').textContent = phase.charAt(0).toUpperCase()+phase.slice(1);
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var target = this.getAttribute('data-tab');
+      document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+      document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+      this.classList.add('active');
+      document.getElementById(target).classList.add('active');
+      if (target==='tab-calendar') renderCalendar();
+      if (target==='tab-lab') renderLabTab();
+      if (target==='tab-matchup') renderMatchupTab();
+      if (target==='tab-props') renderPropsTab();
+      if (target==='tab-picks') renderPicksTab();
+      if (target==='tab-parlays') renderParlaysTab();
+      if (target==='tab-runline') renderRunLineTab();
+      if (target==='tab-metrics') renderMetricsTab();
+    });
+  });
+
+  // Activate first tab
+  document.querySelector('.tab-btn[data-tab="tab-matchup"]').classList.add('active');
+  document.getElementById('tab-matchup').classList.add('active');
+
+  // Load saved keys
+  loadSavedKeys();
+
+  // Restore auto-load checkbox + trigger auto-load if enabled
+  if (safeLoad('mlb_auto_load') === '1') {
+    var alCb = document.getElementById('dc-auto-load');
+    if (alCb) alCb.checked = true;
+    var alLbl = document.getElementById('auto-load-label');
+    if (alLbl) alLbl.textContent = 'On — fetching data now…';
+    setTimeout(function() { dcLoadCloud(true); }, 900);
+  }
+
+  // Set today date inputs
+  var todayStr = now.toISOString().split('T')[0];
+  ['dc-slate-date','cal-task-date'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = todayStr;
+  });
+
+  document.getElementById('ds-teams').textContent = Object.keys(MLB_TEAMS).length + ' teams';
+
+  // Populate team selectors
+  populateTeamSelectors();
+
+  // Initial matchup render
+  renderMatchupTab();
+  renderCalendar();
+});
+
+// ── UTILITIES ──────────────────────────────────────────────────────
+function showStatus(id, msg, type) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-box show ' + (type||'info');
+  el.textContent = msg;
+}
+function hideStatus(id) {
+  var el = document.getElementById(id);
+  if (el) { el.className='status-box'; el.textContent=''; }
+}
+function togglePw(id) {
+  var el = document.getElementById(id);
+  if (el) el.type = el.type==='password'?'text':'password';
+}
+function safeSave(key, val) { try{localStorage.setItem(key,val);return true;}catch(e){return false;} }
+function safeLoad(key) { try{return localStorage.getItem(key)||'';}catch(e){return '';} }
+function maskKey(k) {
+  if (!k||k.length<8) return k?'****':'—';
+  return k.substring(0,4)+'••••••'+k.slice(-4);
+}
+function fmt(n, dec) {
+  if (n===undefined||n===null||n==='') return '—';
+  return parseFloat(n).toFixed(dec||0);
+}
+function fmtOdds(n) {
+  n = parseInt(n);
+  return n>=0?'+'+n:''+n;
+}
+
+// ── TEAM SELECTORS ─────────────────────────────────────────────────
+function populateTeamSelectors() {
+  var abbrs = Object.keys(MLB_TEAMS).sort();
+  var opts = abbrs.map(function(a){ return '<option value="'+a+'">'+a+' — '+MLB_TEAMS[a].city+'</option>'; }).join('');
+  ['mm-away-sel','mm-home-sel','mp-team-sel'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="">— Pick —</option>' + opts;
+  });
+}
+
+// ── LOAD SAVED KEYS ────────────────────────────────────────────────
+function loadSavedKeys() {
+  var fields = {
+    'dc-odds-key':'mlb_odds_key','dc-bigball-key':'mlb_bigball_key',
+    'dc-heygen-key':'mlb_heygen_key','dc-heygen-avatar':'mlb_heygen_avatar',
+    'dc-heygen-voice':'mlb_heygen_voice','dc-heygen-intro':'mlb_heygen_intro',
+    'dc-heygen-short':'mlb_heygen_short','dc-discord-webhook':'mlb_discord_webhook',
+    'dc-github-pat':'mlb_github_pat','dc-github-repo':'mlb_github_repo','dc-github-file':'mlb_github_file',
+    'dc-kit-key':'mlb_kit_key','exp-sender':'mlb_exp_sender',
+    'aff-dk-input':'mlb_aff_dk','aff-fd-input':'mlb_aff_fd','aff-bmgm-input':'mlb_aff_bmgm'
+  };
+  Object.keys(fields).forEach(function(elId){
+    var v = safeLoad(fields[elId]);
+    var el = document.getElementById(elId);
+    if (el && v) el.value = v;
+  });
+  ['dk','fd','bmgm'].forEach(function(k){
+    var v = safeLoad('mlb_aff_'+k);
+    var el = document.getElementById('aff-'+k);
+    if (el && v) el.textContent = v;
+  });
+  var defaults = {
+    'dc-heygen-avatar':'80db54974836409aaea93ba47f1ffcc7',
+    'dc-heygen-voice':'e49bc60d28a94161af86c50c7d19a03c',
+    'dc-heygen-intro':'f45cf2139afe44d2bdf9abe9a1e1e44a',
+    'dc-heygen-short':'9378f12ef1f14b11b435be56c6faf89f',
+    'exp-sender':'picks@youredgereport.com',
+    'dc-github-repo':'Gatorz1989/MLB_Data_Pull',
+    'dc-github-file':'mlb_edge_data.json'
+  };
+  Object.keys(defaults).forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && !el.value) el.value = defaults[id];
+  });
+}
+
+// ── DATA CONNECTIONS ───────────────────────────────────────────────
+function dcSaveOdds(){var k=(document.getElementById('dc-odds-key').value||'').trim();safeSave('mlb_odds_key',k);showStatus('odds-status',k?'✅ Odds API key saved.':'Key cleared.',k?'ok':'warn');}
+function dcTestOdds(){
+  var k=(document.getElementById('dc-odds-key').value||safeLoad('mlb_odds_key')).trim();
+  if(!k){showStatus('odds-status','⚠️ Enter Odds API key first.','warn');return;}
+  showStatus('odds-status','⏳ Testing Odds API key…','info');
+  fetch('https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?apiKey='+k+'&daysFrom=1')
+    .then(function(r){
+      if(r.ok){showStatus('odds-status','✅ Odds API key valid.','ok');safeSave('mlb_odds_key',k);document.getElementById('chip-odds').className='hdr-chip chip-ok';document.getElementById('chip-odds').textContent='ODDS ✓';}
+      else r.text().then(function(t){showStatus('odds-status','❌ Error '+r.status+': '+t.substring(0,120),'err');});
+    }).catch(function(e){showStatus('odds-status','❌ Network error: '+e.message,'err');});
+}
+function dcSaveBigBall(){var k=(document.getElementById('dc-bigball-key').value||'').trim();safeSave('mlb_bigball_key',k);showStatus('bigball-status',k?'✅ BigBall key saved.':'Key cleared.',k?'ok':'warn');}
+function dcTestBigBall(){
+  var k=(document.getElementById('dc-bigball-key').value||safeLoad('mlb_bigball_key')).trim();
+  if(!k){showStatus('bigball-status','⚠️ Enter BigBall key first.','warn');return;}
+  showStatus('bigball-status','⏳ Testing BigBall…','info');
+  fetch('https://api.sportsdata.io/v3/mlb/scores/json/Games/2026?key='+k)
+    .then(function(r){if(r.ok){showStatus('bigball-status','✅ BigBall key valid.','ok');safeSave('mlb_bigball_key',k);}else{showStatus('bigball-status','❌ Error '+r.status,'err');}})
+    .catch(function(e){showStatus('bigball-status','❌ Network error: '+e.message,'err');});
+}
+function dcSaveHeyGen(){var k=(document.getElementById('dc-heygen-key').value||'').trim();safeSave('mlb_heygen_key',k);showStatus('heygen-status',k?'✅ HeyGen key saved.':'Key cleared.',k?'ok':'warn');}
+function dcSaveHeyGenMeta(){
+  safeSave('mlb_heygen_avatar',document.getElementById('dc-heygen-avatar').value.trim());
+  safeSave('mlb_heygen_voice',document.getElementById('dc-heygen-voice').value.trim());
+  safeSave('mlb_heygen_intro',document.getElementById('dc-heygen-intro').value.trim());
+  safeSave('mlb_heygen_short',document.getElementById('dc-heygen-short').value.trim());
+  showStatus('heygen-status','✅ HeyGen configuration saved.','ok');
+}
+function dcTestHeyGen(){
+  var k=(document.getElementById('dc-heygen-key').value||safeLoad('mlb_heygen_key')).trim();
+  if(!k){showStatus('heygen-status','⚠️ Enter HeyGen key first.','warn');return;}
+  showStatus('heygen-status','⏳ Testing HeyGen…','info');
+  fetch('https://api.heygen.com/v1/template.list',{headers:{'X-Api-Key':k}})
+    .then(function(r){if(r.ok){showStatus('heygen-status','✅ HeyGen key valid.','ok');safeSave('mlb_heygen_key',k);}else{showStatus('heygen-status','❌ HeyGen error '+r.status,'err');}})
+    .catch(function(e){showStatus('heygen-status','❌ Network error: '+e.message,'err');});
+}
+function dcSaveDiscord(){var k=(document.getElementById('dc-discord-webhook').value||'').trim();safeSave('mlb_discord_webhook',k);showStatus('discord-status',k?'✅ Discord webhook saved.':'Cleared.',k?'ok':'warn');}
+function dcTestDiscord(){
+  var k=(document.getElementById('dc-discord-webhook').value||safeLoad('mlb_discord_webhook')).trim();
+  if(!k){showStatus('discord-status','⚠️ Enter webhook URL first.','warn');return;}
+  showStatus('discord-status','⏳ Testing Discord…','info');
+  fetch(k,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:'⚾ MLB Edge Model v1.2 — connection test from The Edge Report'})})
+    .then(function(r){if(r.status===204||r.ok){showStatus('discord-status','✅ Discord webhook working.','ok');safeSave('mlb_discord_webhook',k);}else{showStatus('discord-status','❌ Discord error '+r.status,'err');}})
+    .catch(function(e){showStatus('discord-status','❌ Network error: '+e.message,'err');});
+}
+function dcSaveGitHub(){
+  var pat=(document.getElementById('dc-github-pat').value||'').trim();
+  var repo=(document.getElementById('dc-github-repo').value||'Gatorz1989/MLB_Data_Pull').trim();
+  var file=((document.getElementById('dc-github-file')||{}).value||'mlb_edge_data.json').trim();
+  safeSave('mlb_github_pat',pat); safeSave('mlb_github_repo',repo); safeSave('mlb_github_file',file);
+  showStatus('github-status','✅ GitHub settings saved. PAT: '+maskKey(pat)+' | Repo: '+repo+' | File: '+file,'ok');
+}
+function dcTestGitHub(){
+  var pat=(document.getElementById('dc-github-pat').value||safeLoad('mlb_github_pat')).trim();
+  var repo=(document.getElementById('dc-github-repo').value||safeLoad('mlb_github_repo')||'Gatorz1989/MLB_Data_Pull').trim();
+  if(!pat){showStatus('github-status','⚠️ Enter GitHub PAT first.','warn');return;}
+  showStatus('github-status','⏳ Testing GitHub…','info');
+  fetch('https://api.github.com/repos/'+repo,{headers:{'Authorization':'token '+pat}})
+    .then(function(r){if(r.ok){showStatus('github-status','✅ GitHub access confirmed: '+repo,'ok');safeSave('mlb_github_pat',pat);safeSave('mlb_github_repo',repo);}else{showStatus('github-status','❌ GitHub error '+r.status,'err');}})
+    .catch(function(e){showStatus('github-status','❌ Network error: '+e.message,'err');});
+}
+function dcSaveKit(){var k=(document.getElementById('dc-kit-key').value||'').trim();safeSave('mlb_kit_key',k);if(k)showStatus('github-status','✅ Kit key saved.','ok');}
+
+function dcToggleAutoLoad(cb) {
+  var on = cb.checked;
+  safeSave('mlb_auto_load', on ? '1' : '0');
+  var lbl = document.getElementById('auto-load-label');
+  if (lbl) lbl.textContent = on ? 'On — data will load automatically on open' : 'Off — opens without fetching data';
+}
+
+function dcTestAllKeys(){
+  var summaryEl=document.getElementById('all-keys-summary');
+  var rowsEl=document.getElementById('key-rows');
+  summaryEl.style.display='block';
+  showStatus('all-keys-status','⏳ Checking all keys…','info');
+  var keys=[
+    {name:'Odds API',val:safeLoad('mlb_odds_key')},
+    {name:'BigBall',val:safeLoad('mlb_bigball_key')},
+    {name:'HeyGen',val:safeLoad('mlb_heygen_key')},
+    {name:'Discord',val:safeLoad('mlb_discord_webhook')},
+    {name:'GitHub PAT',val:safeLoad('mlb_github_pat')},
+    {name:'Kit',val:safeLoad('mlb_kit_key')}
+  ];
+  rowsEl.innerHTML = keys.map(function(k){
+    var cls=k.val?'ks-ok':'ks-none', lbl=k.val?'✓ SET':'NOT SET';
+    return '<div class="key-row"><span class="key-name">'+k.name+'</span><span class="key-val">'+(k.val?maskKey(k.val):'—')+'</span><span class="key-status '+cls+'">'+lbl+'</span></div>';
+  }).join('');
+  showStatus('all-keys-status','Key check complete.','info');
+}
+
+// ── CLOUD / UPLOAD ─────────────────────────────────────────────────
+function dcLoadCloud(isAutoLoad) {
+  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB_Data_Pull';
+  var pat  = safeLoad('mlb_github_pat');
+  var file = safeLoad('mlb_github_file') || 'mlb_edge_data.json';
+  var iconEl = document.getElementById('cloud-load-icon');
+  showStatus('cloud-load-status', '⏳ ' + (isAutoLoad ? 'Auto-loading' : 'Fetching') + ' ' + file + ' from ' + repo + '…', 'info');
+  if (iconEl) iconEl.innerHTML = '<span class="spin"></span>';
+  // Try main branch first, fall back to master
+  var baseUrl = 'https://raw.githubusercontent.com/' + repo + '/';
+  var headers = {}; if (pat) headers['Authorization'] = 'token ' + pat;
+  function tryBranch(branch) {
+    return fetch(baseUrl + branch + '/' + file, {headers: headers})
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      });
+  }
+  tryBranch('main')
+    .catch(function() { return tryBranch('master'); })
+    .then(function(data) {
+      ingestModelData(data, 'GitHub/' + repo);
+      if (iconEl) iconEl.textContent = '☁️';
+      var alLbl = document.getElementById('auto-load-label');
+      if (alLbl && isAutoLoad) alLbl.textContent = 'On — loaded ✓ ' + new Date().toLocaleTimeString();
+    })
+    .catch(function(e) {
+      showStatus('cloud-load-status', '❌ ' + (isAutoLoad ? 'Auto-load' : 'Load') + ' failed: ' + e.message + '. Run mlb_edge_data_pull.py --push first.', 'err');
+      if (iconEl) iconEl.textContent = '☁️';
+    });
+}
+function dcUploadJSON(input){
+  var file=input.files[0]; if(!file) return;
+  showStatus('json-upload-status','⏳ Reading '+file.name+'…','info');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{var data=JSON.parse(e.target.result); ingestModelData(data,'Upload: '+file.name);}
+    catch(err){showStatus('json-upload-status','❌ JSON parse error: '+err.message,'err');}
+  };
+  reader.readAsText(file);
+}
+
+// ── INGEST DATA (Stage 2 aware) ────────────────────────────────────
+function ingestModelData(data, source) {
+  MODEL_DATA.loaded=true; MODEL_DATA.source=source;
+  MODEL_DATA.pullTime=data.generated_at||data.pullTime||'Unknown';
+  MODEL_DATA.games=data.games||data.scheduleGames||[];
+  MODEL_DATA.batters=data.batters||data.players||[];
+  MODEL_DATA.pitchers=data.pitchers||[];
+  MODEL_DATA.props=data.props||[];
+  // Data summary
+  document.getElementById('ds-games').textContent=MODEL_DATA.games.length;
+  document.getElementById('ds-batters').textContent=MODEL_DATA.batters.length;
+  document.getElementById('ds-pitchers').textContent=MODEL_DATA.pitchers.length;
+  document.getElementById('ds-props').textContent=MODEL_DATA.props.length;
+  document.getElementById('ds-source').textContent=source;
+  document.getElementById('ds-pull-time').textContent=MODEL_DATA.pullTime;
+  // Header chips
+  document.getElementById('chip-data').className='hdr-chip chip-ok';
+  document.getElementById('chip-data').textContent='DATA ✓';
+  document.getElementById('hdr-slate').textContent=MODEL_DATA.games.length+' games loaded';
+  showStatus('cloud-load-status','✅ Loaded from '+source+': '+MODEL_DATA.games.length+' games, '+MODEL_DATA.batters.length+' batters, '+MODEL_DATA.pitchers.length+' pitchers, '+MODEL_DATA.props.length+' prop lines.','ok');
+  showStatus('json-upload-status','✅ Loaded from '+source,'ok');
+  // Stage 2: populate all engine tabs
+  scoreProps();
+  populateGameSelector();
+  populatePropsTeamFilter();
+  populateMetricsTeamFilter();
+  renderMatchupTab();
+  renderPropsTab();
+  renderPicksTab();
+  buildParlays();
+  renderParlaysTab();
+  renderRunLineTab();
+  renderMetricsTab();
+  populateSharpSelector();
+}
+
+
+/* ============================================================
+   STAGE 2 ENGINE — PART 2: Tier / Props / Matchup / Picks
+   ============================================================ */
+
+function assignTier(edgePct) {
+  if (edgePct >= 8) return 'ELITE';
+  if (edgePct >= 4) return 'STRONG';
+  if (edgePct >= 1) return 'LEAN';
+  return 'SKIP';
+}
+
+function scoreProps() {
+  var manualPicks = PICKS_DATA.filter(function(p) { return p.isManual; });
+  var autoPicks = (MODEL_DATA.props || []).map(function(p) {
+    var proj = parseFloat(p.projection) || 0;
+    var line = parseFloat(p.line) || 0;
+    var edge = typeof p.edge === 'number' ? p.edge :
+               (proj > 0 && line > 0 ? Math.round(((proj / line) - 1) * 1000) / 10 : 0);
+    return {
+      player: p.player || 'Unknown',
+      team: p.team || '',
+      propType: p.propType || p.type || 'K',
+      line: line,
+      projection: proj,
+      edge: edge,
+      tier: assignTier(edge),
+      book: ((p.book || 'draftkings')).toLowerCase(),
+      odds: parseInt(p.odds) || -110,
+      isManual: false,
+      idx: 0
+    };
+  });
+  PICKS_DATA = autoPicks.concat(manualPicks);
+  PICKS_DATA.sort(function(a, b) { return b.edge - a.edge; });
+  PICKS_DATA.forEach(function(p, i) { p.idx = i; });
+}
+
+/* ---------- Matchup Tab ---------- */
+
+function populateGameSelector() {
+  var sel = document.getElementById('game-selector');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  (MODEL_DATA.games || []).forEach(function(g, i) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = (g.awayTeam || 'Away') + ' @ ' + (g.homeTeam || 'Home') +
+      (g.time ? '  ' + g.time : '');
+    sel.appendChild(opt);
+  });
+}
+
+function selectGame() {
+  var sel = document.getElementById('game-selector');
+  if (!sel) return;
+  var idx = parseInt(sel.value);
+  if (isNaN(idx) || idx < 0) { CURRENT_GAME = null; renderMatchupTab(); return; }
+  CURRENT_GAME = MODEL_DATA.games[idx] || null;
+  renderMatchupTab();
+}
+
+function toggleManualGame() {
+  var box = document.getElementById('manual-game-box');
+  if (!box) return;
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function buildManualMatchup() {
+  var get = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  _MANUAL_GAME = {
+    awayTeam: get('mg-away') || 'Away',
+    homeTeam: get('mg-home') || 'Home',
+    awayPitcher: get('mg-away-sp') || '—',
+    homePitcher: get('mg-home-sp') || '—',
+    awayERA: parseFloat(get('mg-away-era')) || 0,
+    homeERA: parseFloat(get('mg-home-era')) || 0,
+    awayK9: parseFloat(get('mg-away-k9')) || 0,
+    homeK9: parseFloat(get('mg-home-k9')) || 0,
+    awayWHIP: parseFloat(get('mg-away-whip')) || 0,
+    homeWHIP: parseFloat(get('mg-home-whip')) || 0,
+    total: parseFloat(get('mg-total')) || 0,
+    awayML: parseInt(get('mg-away-ml')) || 0,
+    homeML: parseInt(get('mg-home-ml')) || 0,
+    park: get('mg-park') || ''
+  };
+  CURRENT_GAME = _MANUAL_GAME;
+  var box = document.getElementById('manual-game-box');
+  if (box) box.style.display = 'none';
+  renderMatchupTab();
+}
+
+function renderMatchupTab() {
+  var g = CURRENT_GAME;
+  var projDiv = document.getElementById('matchup-projection');
+  if (!projDiv) return;
+
+  if (!g) {
+    projDiv.innerHTML = '<div class="no-data-notice">Select a game above or enter details manually to view the matchup breakdown.</div>';
+    return;
+  }
+
+  // Park factors lookup
+  var parkKey = (g.homeTeam || '').toLowerCase().replace(/\s+/g,'_');
+  var parkData = MLB_TEAMS[parkKey] || {};
+  var parkFactor = parkData.parkFactor || 100;
+  var parkLabel = parkFactor > 100 ? 'Hitter-friendly' : parkFactor < 100 ? 'Pitcher-friendly' : 'Neutral';
+  var parkClass = parkFactor > 100 ? 'status-success' : parkFactor < 100 ? 'status-warning' : '';
+
+  // SP comparison
+  var spHtml = '<div class="sp-compare">' +
+    '<div class="sp-card">' +
+      '<div class="sp-name">' + esc(g.awayPitcher || '—') + '</div>' +
+      '<div class="sp-team">' + esc(g.awayTeam || '') + ' (Away)</div>' +
+      '<div class="sp-stats">' +
+        '<span>ERA <b>' + (g.awayERA || '—') + '</b></span>' +
+        '<span>K/9 <b>' + (g.awayK9 || '—') + '</b></span>' +
+        '<span>WHIP <b>' + (g.awayWHIP || '—') + '</b></span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sp-vs">VS</div>' +
+    '<div class="sp-card">' +
+      '<div class="sp-name">' + esc(g.homePitcher || '—') + '</div>' +
+      '<div class="sp-team">' + esc(g.homeTeam || '') + ' (Home)</div>' +
+      '<div class="sp-stats">' +
+        '<span>ERA <b>' + (g.homeERA || '—') + '</b></span>' +
+        '<span>K/9 <b>' + (g.homeK9 || '—') + '</b></span>' +
+        '<span>WHIP <b>' + (g.homeWHIP || '—') + '</b></span>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  var projHtml = '<div class="card" style="margin-top:12px">' +
+    '<h3 style="margin:0 0 10px">Game Projection</h3>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">' +
+      '<div><div class="stat-label">Total (O/U)</div><div class="stat-big">' + (g.total || '—') + '</div></div>' +
+      '<div><div class="stat-label">' + esc(g.awayTeam || 'Away') + ' ML</div><div class="stat-big">' + fmtOdds(g.awayML) + '</div></div>' +
+      '<div><div class="stat-label">' + esc(g.homeTeam || 'Home') + ' ML</div><div class="stat-big">' + fmtOdds(g.homeML) + '</div></div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card" style="margin-top:12px">' +
+    '<h3 style="margin:0 0 10px">Park Factors — ' + esc(g.park || (g.homeTeam || 'Home') + ' Park') + '</h3>' +
+    '<div style="display:flex;align-items:center;gap:16px">' +
+      '<div class="stat-big">' + parkFactor + '</div>' +
+      '<div><span class="status-badge ' + parkClass + '">' + parkLabel + '</span>' +
+        (parkData.isIndoor ? '<span class="status-badge" style="margin-left:6px">Indoor</span>' : '') +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  projDiv.innerHTML = spHtml + projHtml;
+}
+
+/* ---------- Props Tab ---------- */
+
+function populatePropsTeamFilter() {
+  var sel = document.getElementById('props-team-filter');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  var teams = {};
+  (PICKS_DATA || []).forEach(function(p) { if (p.team) teams[p.team] = 1; });
+  Object.keys(teams).sort().forEach(function(t) {
+    var opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    sel.appendChild(opt);
+  });
+}
+
+function renderPropsTab() {
+  var tbody = document.getElementById('props-tbody');
+  if (!tbody) return;
+  var teamFilter = (document.getElementById('props-team-filter') || {}).value || '';
+  var typeFilter = (document.getElementById('props-type-filter') || {}).value || '';
+  var tierFilter = (document.getElementById('props-tier-filter') || {}).value || '';
+  var bookFilter = (document.getElementById('props-book-filter') || {}).value || '';
+
+  var rows = PICKS_DATA.filter(function(p) {
+    if (teamFilter && p.team !== teamFilter) return false;
+    if (typeFilter && p.propType !== typeFilter) return false;
+    if (tierFilter && p.tier !== tierFilter) return false;
+    if (bookFilter && p.book !== bookFilter) return false;
+    return true;
+  });
+
+  // Sort
+  var col = PROPS_SORT.col, dir = PROPS_SORT.dir;
+  rows.sort(function(a, b) {
+    var av = a[col], bv = b[col];
+    if (typeof av === 'string') return dir * av.localeCompare(bv);
+    return dir * ((av || 0) - (bv || 0));
+  });
+
+  // Update sort indicators
+  ['player','propType','line','projection','edge','tier','book','odds'].forEach(function(c) {
+    var th = document.getElementById('ph-' + c);
+    if (th) th.classList.toggle('sorted', c === col);
+  });
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;opacity:.5">' +
+      (PICKS_DATA.length ? 'No props match filters.' : 'No props loaded. Add manually below or load JSON data.') +
+      '</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(function(p) {
+    var edgeSign = p.edge >= 0 ? '+' : '';
+    return '<tr>' +
+      '<td>' + esc(p.player) + (p.isManual ? ' <span style="font-size:10px;opacity:.5">[M]</span>' : '') + '</td>' +
+      '<td>' + esc(p.team) + '</td>' +
+      '<td>' + esc(p.propType) + '</td>' +
+      '<td>' + p.line + '</td>' +
+      '<td>' + p.projection + '</td>' +
+      '<td style="color:' + edgeColor(p.edge) + '">' + edgeSign + p.edge + '%</td>' +
+      '<td><span class="tier-badge tier-' + p.tier + '">' + p.tier + '</span></td>' +
+      '<td>' + esc(p.book) + '</td>' +
+      '<td>' + fmtOdds(p.odds) + '</td>' +
+      '<td><button class="btn-sm" onclick="toggleParlayLeg(' + p.idx + ')">+Parlay</button>' +
+        '<button class="btn-sm btn-danger" onclick="deletePick(' + p.idx + ')" style="margin-left:4px">✕</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function sortProps(col) {
+  if (PROPS_SORT.col === col) PROPS_SORT.dir *= -1;
+  else { PROPS_SORT.col = col; PROPS_SORT.dir = -1; }
+  renderPropsTab();
+}
+
+function clearPropsFilters() {
+  ['props-team-filter','props-type-filter','props-tier-filter','props-book-filter'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  renderPropsTab();
+}
+
+function addManualProp() {
+  var get = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  var player = get('mp-player');
+  if (!player) { alert('Player name required.'); return; }
+  var line = parseFloat(get('mp-line')) || 0;
+  var proj = parseFloat(get('mp-proj')) || 0;
+  var edge = proj > 0 && line > 0 ? Math.round(((proj / line) - 1) * 1000) / 10 : parseFloat(get('mp-edge')) || 0;
+  var pick = {
+    player: player,
+    team: get('mp-team'),
+    propType: get('mp-type') || 'K',
+    line: line,
+    projection: proj,
+    edge: edge,
+    tier: assignTier(edge),
+    book: (get('mp-book') || 'draftkings').toLowerCase(),
+    odds: parseInt(get('mp-odds')) || -110,
+    isManual: true,
+    idx: PICKS_DATA.length
+  };
+  PICKS_DATA.push(pick);
+  PICKS_DATA.forEach(function(p, i) { p.idx = i; });
+  ['mp-player','mp-team','mp-line','mp-proj','mp-edge','mp-odds'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  renderPropsTab();
+  renderPicksTab();
+  populatePropsTeamFilter();
+}
+
+function deletePick(idx) {
+  PICKS_DATA = PICKS_DATA.filter(function(p) { return p.idx !== idx; });
+  PICKS_DATA.forEach(function(p, i) { p.idx = i; });
+  PARLAY_LEGS = PARLAY_LEGS.filter(function(l) { return l !== idx; });
+  renderPropsTab();
+  renderPicksTab();
+  renderParlaysTab();
+}
+
+function clearAllPicks() {
+  if (!confirm('Clear all auto-scored picks (manual picks kept)?')) return;
+  PICKS_DATA = PICKS_DATA.filter(function(p) { return p.isManual; });
+  PICKS_DATA.forEach(function(p, i) { p.idx = i; });
+  PARLAY_LEGS = [];
+  renderPropsTab();
+  renderPicksTab();
+  renderParlaysTab();
+}
+
+/* ---------- Top Picks Tab ---------- */
+
+function setPicksFilter(f) {
+  PICKS_FILTER = f;
+  document.querySelectorAll('.filter-chip').forEach(function(c) {
+    c.classList.toggle('active', c.dataset.filter === f);
+  });
+  renderPicksTab();
+}
+
+function renderPicksTab() {
+  var grid = document.getElementById('picks-grid');
+  if (!grid) return;
+
+  var rows = PICKS_DATA.filter(function(p) {
+    if (PICKS_FILTER === 'elite') return p.tier === 'ELITE';
+    if (PICKS_FILTER === 'strong') return p.tier === 'STRONG' || p.tier === 'ELITE';
+    if (PICKS_FILTER === 'parlay') return PARLAY_LEGS.indexOf(p.idx) >= 0;
+    return p.tier !== 'SKIP';
+  });
+
+  var countEl = document.getElementById('picks-count');
+  if (countEl) countEl.textContent = rows.length + ' pick' + (rows.length !== 1 ? 's' : '');
+
+  if (!rows.length) {
+    grid.innerHTML = '<div class="no-data-notice">' +
+      (PICKS_DATA.length ? 'No picks match the current filter.' : 'No picks loaded. Add props to generate picks.') +
+      '</div>';
+    return;
+  }
+
+  grid.innerHTML = rows.map(function(p) {
+    var inParlay = PARLAY_LEGS.indexOf(p.idx) >= 0;
+    var edgeSign = p.edge >= 0 ? '+' : '';
+    return '<div class="pick-card' + (inParlay ? ' in-parlay' : '') + '">' +
+      '<div class="pick-header">' +
+        '<span class="tier-badge tier-' + p.tier + '">' + p.tier + '</span>' +
+        (p.isManual ? '<span style="font-size:10px;opacity:.5;margin-left:6px">MANUAL</span>' : '') +
+      '</div>' +
+      '<div class="pick-player">' + esc(p.player) + '</div>' +
+      '<div class="pick-sub">' + esc(p.team) + ' · ' + esc(p.propType) + '</div>' +
+      '<div class="pick-line">Line: <b>' + p.line + '</b> · Proj: <b>' + p.projection + '</b></div>' +
+      '<div class="pick-edge" style="color:' + edgeColor(p.edge) + '">' + edgeSign + p.edge + '% edge</div>' +
+      '<div class="pick-book">' + esc(p.book) + ' · ' + fmtOdds(p.odds) + '</div>' +
+      '<div class="pick-actions">' +
+        '<button class="btn-sm' + (inParlay ? ' active' : '') + '" onclick="toggleParlayLeg(' + p.idx + ')">' +
+          (inParlay ? '✓ In Parlay' : '+ Parlay') +
+        '</button>' +
+        '<button class="btn-sm btn-danger" onclick="deletePick(' + p.idx + ')">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ---------- Parlays Tab ---------- */
+
+function americanToDecimal(american) {
+  american = parseInt(american) || -110;
+  if (american >= 100) return (american / 100) + 1;
+  return (100 / Math.abs(american)) + 1;
+}
+
+function decimalToAmerican(decimal) {
+  if (decimal >= 2) return '+' + Math.round((decimal - 1) * 100);
+  return Math.round(-100 / (decimal - 1)).toString();
+}
+
+function parlayOdds(legs) {
+  if (!legs.length) return 'N/A';
+  var combined = legs.reduce(function(acc, p) { return acc * americanToDecimal(p.odds); }, 1);
+  return decimalToAmerican(combined);
+}
+
+function toggleParlayLeg(idx) {
+  var pos = PARLAY_LEGS.indexOf(idx);
+  if (pos >= 0) PARLAY_LEGS.splice(pos, 1);
+  else PARLAY_LEGS.push(idx);
+  renderPicksTab();
+  renderParlaysTab();
+}
+
+function clearParlayLegs() {
+  PARLAY_LEGS = [];
+  renderPicksTab();
+  renderParlaysTab();
+}
+
+function buildParlays() {
+  // Auto-build 2-leg combos from ELITE picks
+  var elites = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE'; });
+  var combos = [];
+  for (var i = 0; i < elites.length && combos.length < 6; i++) {
+    for (var j = i + 1; j < elites.length && combos.length < 6; j++) {
+      combos.push([elites[i], elites[j]]);
+    }
+  }
+  // Add 3-leg if enough elites
+  if (elites.length >= 3) {
+    combos.push([elites[0], elites[1], elites[2]]);
+  }
+  return combos;
+}
+
+function renderParlaysTab() {
+  // My Parlay
+  var myBox = document.getElementById('my-parlay-legs');
+  var myOddsEl = document.getElementById('my-parlay-odds');
+  if (myBox) {
+    var legs = PICKS_DATA.filter(function(p) { return PARLAY_LEGS.indexOf(p.idx) >= 0; });
+    if (!legs.length) {
+      myBox.innerHTML = '<div style="opacity:.5;padding:12px 0">No legs added. Click "+ Parlay" on any pick.</div>';
+    } else {
+      myBox.innerHTML = legs.map(function(p) {
+        return '<div class="parlay-leg">' +
+          '<span class="tier-badge tier-' + p.tier + '">' + p.tier + '</span> ' +
+          '<b>' + esc(p.player) + '</b> ' + esc(p.propType) + ' ' + p.line +
+          ' <span style="color:var(--muted)">' + fmtOdds(p.odds) + '</span>' +
+          '<button class="btn-sm btn-danger" style="float:right" onclick="toggleParlayLeg(' + p.idx + ')">✕</button>' +
+        '</div>';
+      }).join('');
+    }
+    if (myOddsEl) myOddsEl.textContent = legs.length ? 'Combined: ' + parlayOdds(legs) : '';
+  }
+
+  // Auto Combos
+  var comboBox = document.getElementById('auto-combos');
+  if (!comboBox) return;
+  var combos = buildParlays();
+  if (!combos.length) {
+    comboBox.innerHTML = '<div style="opacity:.5;padding:12px 0">Load ELITE picks to see auto-generated parlays.</div>';
+    return;
+  }
+  comboBox.innerHTML = combos.map(function(legs, ci) {
+    var odds = parlayOdds(legs);
+    return '<div class="parlay-combo">' +
+      '<div class="parlay-combo-header">Combo ' + (ci + 1) + ' (' + legs.length + '-leg) · ' + odds + '</div>' +
+      legs.map(function(p) {
+        return '<div class="parlay-leg">' +
+          '<span class="tier-badge tier-' + p.tier + '">' + p.tier + '</span> ' +
+          '<b>' + esc(p.player) + '</b> ' + esc(p.propType) + ' ' + p.line +
+          ' <span style="color:var(--muted)">' + fmtOdds(p.odds) + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+/* ---------- Run Line Tab ---------- */
+
+function renderRunLineTab() {
+  var noData = document.getElementById('rl-no-data');
+  var content = document.getElementById('rl-content');
+  if (!noData || !content) return;
+
+  var rlGames = (MODEL_DATA.games || []).filter(function(g) {
+    return g.awayRL || g.homeRL || g.awayMLAdj || g.homeMLAdj;
+  });
+
+  if (!MODEL_DATA.loaded || !rlGames.length) {
+    noData.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+  noData.style.display = 'none';
+  content.style.display = 'block';
+
+  var tbody = document.getElementById('rl-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = rlGames.map(function(g) {
+    var edgeA = g.awayRLEdge || 0;
+    var edgeH = g.homeRLEdge || 0;
+    var bestEdge = Math.abs(edgeA) > Math.abs(edgeH) ? edgeA : edgeH;
+    var bestSide = Math.abs(edgeA) > Math.abs(edgeH) ?
+      esc(g.awayTeam) + ' -1.5' : esc(g.homeTeam) + ' -1.5';
+    return '<tr>' +
+      '<td>' + esc(g.awayTeam || '') + ' @ ' + esc(g.homeTeam || '') + '</td>' +
+      '<td>' + esc(g.awayTeam || '') + ' ' + fmtOdds(g.awayRL) + '</td>' +
+      '<td>' + esc(g.homeTeam || '') + ' ' + fmtOdds(g.homeRL) + '</td>' +
+      '<td style="color:' + edgeColor(bestEdge) + '">' + (bestEdge >= 0 ? '+' : '') + bestEdge + '%</td>' +
+      '<td><span class="tier-badge tier-' + assignTier(bestEdge) + '">' + assignTier(bestEdge) + '</span></td>' +
+      '<td>' + bestSide + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+/* ---------- Metrics Tab ---------- */
+
+function populateMetricsTeamFilter() {
+  ['metrics-team-batter','metrics-team-pitcher'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    while (sel.options.length > 1) sel.remove(1);
+    var arr = id.includes('batter') ? (MODEL_DATA.batters || []) : (MODEL_DATA.pitchers || []);
+    var teams = {};
+    arr.forEach(function(p) { if (p.team) teams[p.team] = 1; });
+    Object.keys(teams).sort().forEach(function(t) {
+      var opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function switchMetrics(mode) {
+  METRICS_MODE = mode;
+  ['batter','pitcher'].forEach(function(m) {
+    var btn = document.getElementById('metrics-btn-' + m);
+    var tbl = document.getElementById('metrics-tbl-' + m);
+    if (btn) btn.classList.toggle('active', m === mode);
+    if (tbl) tbl.style.display = m === mode ? '' : 'none';
+  });
+  renderMetricsTab();
+}
+
+function sortMetrics(col) {
+  if (METRICS_MODE === 'batter') {
+    if (METRICS_SORT_BATTER.col === col) METRICS_SORT_BATTER.dir *= -1;
+    else { METRICS_SORT_BATTER.col = col; METRICS_SORT_BATTER.dir = -1; }
+  } else {
+    if (METRICS_SORT_PITCHER.col === col) METRICS_SORT_PITCHER.dir *= -1;
+    else { METRICS_SORT_PITCHER.col = col; METRICS_SORT_PITCHER.dir = col === 'era' || col === 'whip' ? 1 : -1; }
+  }
+  renderMetricsTab();
+}
+
+function renderMetricsTab() {
+  if (METRICS_MODE === 'batter') renderBatterTable();
+  else renderPitcherTable();
+}
+
+function renderBatterTable() {
+  var tbody = document.getElementById('batter-tbody');
+  if (!tbody) return;
+  var teamFilter = (document.getElementById('metrics-team-batter') || {}).value || '';
+  var rows = (MODEL_DATA.batters || []).filter(function(p) {
+    return !teamFilter || p.team === teamFilter;
+  });
+  var sort = METRICS_SORT_BATTER;
+  rows.sort(function(a, b) {
+    var av = a[sort.col], bv = b[sort.col];
+    if (typeof av === 'string') return sort.dir * (av || '').localeCompare(bv || '');
+    return sort.dir * ((av || 0) - (bv || 0));
+  });
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;opacity:.5">' +
+      (MODEL_DATA.batters && MODEL_DATA.batters.length ? 'No batters match filter.' : 'No batter data loaded.') +
+      '</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(p) {
+    return '<tr>' +
+      '<td>' + esc(p.name || p.player || '—') + '</td>' +
+      '<td>' + esc(p.team || '—') + '</td>' +
+      '<td>' + fmtStat(p.avg, 3) + '</td>' +
+      '<td>' + fmtStat(p.obp, 3) + '</td>' +
+      '<td>' + fmtStat(p.slg, 3) + '</td>' +
+      '<td>' + fmtStat(p.ops, 3) + '</td>' +
+      '<td>' + (p.hr || 0) + '</td>' +
+      '<td>' + (p.rbi || 0) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderPitcherTable() {
+  var tbody = document.getElementById('pitcher-tbody');
+  if (!tbody) return;
+  var teamFilter = (document.getElementById('metrics-team-pitcher') || {}).value || '';
+  var rows = (MODEL_DATA.pitchers || []).filter(function(p) {
+    return !teamFilter || p.team === teamFilter;
+  });
+  var sort = METRICS_SORT_PITCHER;
+  rows.sort(function(a, b) {
+    var av = a[sort.col], bv = b[sort.col];
+    if (typeof av === 'string') return sort.dir * (av || '').localeCompare(bv || '');
+    return sort.dir * ((av || 0) - (bv || 0));
+  });
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;opacity:.5">' +
+      (MODEL_DATA.pitchers && MODEL_DATA.pitchers.length ? 'No pitchers match filter.' : 'No pitcher data loaded.') +
+      '</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(p) {
+    return '<tr>' +
+      '<td>' + esc(p.name || p.player || '—') + '</td>' +
+      '<td>' + esc(p.team || '—') + '</td>' +
+      '<td>' + fmtStat(p.era, 2) + '</td>' +
+      '<td>' + fmtStat(p.whip, 2) + '</td>' +
+      '<td>' + fmtStat(p.k9, 1) + '</td>' +
+      '<td>' + fmtStat(p.bb9, 1) + '</td>' +
+      '<td>' + (p.wins || 0) + '</td>' +
+      '<td>' + (p.ip || 0) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+/* ---------- Utility helpers ---------- */
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtOdds(n) {
+  if (!n && n !== 0) return '—';
+  return n >= 0 ? '+' + n : String(n);
+}
+
+function fmtStat(v, decimals) {
+  if (v === undefined || v === null || isNaN(v)) return '—';
+  return parseFloat(v).toFixed(decimals);
+}
+
+function edgeColor(edge) {
+  if (edge >= 8) return '#ff6b1a';
+  if (edge >= 4) return 'var(--gold)';
+  if (edge >= 1) return '#4fc3f7';
+  return 'var(--muted)';
+}
+
+
+/* ============================================================
+   STAGE 2 ENGINE — PART 3: Export / Thumbnail / HeyGen / Slideshow
+   ============================================================ */
+
+/* ---------- Sharp Lock Export ---------- */
+
+function populateSharpSelector() {
+  var sel = document.getElementById('sharp-pick-select');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  var top = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE' || p.tier === 'STRONG'; });
+  top.slice(0, 20).forEach(function(p, i) {
+    var opt = document.createElement('option');
+    opt.value = p.idx;
+    opt.textContent = p.player + ' ' + p.propType + ' ' + p.line + ' (' + p.tier + ')';
+    sel.appendChild(opt);
+  });
+}
+
+function expLockSharp() {
+  var sel = document.getElementById('sharp-pick-select');
+  var noteEl = document.getElementById('sharp-pick-note');
+  if (!sel || sel.value === '') { alert('Select a pick first.'); return; }
+  var pick = PICKS_DATA.find(function(p) { return p.idx === parseInt(sel.value); });
+  if (!pick) return;
+  var note = noteEl ? noteEl.value.trim() : '';
+  MODEL_DATA.sharpLock = { pick: pick, note: note, lockedAt: new Date().toISOString() };
+  safeSave('mlb_sharp_lock', JSON.stringify(MODEL_DATA.sharpLock));
+  var st = document.getElementById('sharp-lock-status');
+  if (st) { st.textContent = '✓ Sharp Lock set: ' + pick.player + ' ' + pick.propType + ' ' + pick.line; st.className = 'status-box status-success'; }
+}
+
+function expResetSharp() {
+  MODEL_DATA.sharpLock = null;
+  safeSave('mlb_sharp_lock', '');
+  var st = document.getElementById('sharp-lock-status');
+  if (st) { st.textContent = 'Sharp Lock cleared.'; st.className = 'status-box status-warning'; }
+}
+
+function expGenerateReport() {
+  var elite = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE'; });
+  var strong = PICKS_DATA.filter(function(p) { return p.tier === 'STRONG'; });
+  var lean = PICKS_DATA.filter(function(p) { return p.tier === 'LEAN'; });
+  var lines = [
+    '# MLB Edge Report — ' + new Date().toLocaleDateString(),
+    '',
+    '**ELITE (' + elite.length + '):** ' + elite.map(function(p) { return p.player + ' ' + p.propType + ' ' + p.line; }).join(', '),
+    '**STRONG (' + strong.length + '):** ' + strong.map(function(p) { return p.player + ' ' + p.propType + ' ' + p.line; }).join(', '),
+    '**LEAN (' + lean.length + '):** ' + lean.map(function(p) { return p.player + ' ' + p.propType + ' ' + p.line; }).join(', '),
+    ''
+  ];
+  if (MODEL_DATA.sharpLock && MODEL_DATA.sharpLock.pick) {
+    var sl = MODEL_DATA.sharpLock;
+    lines.push('🔒 **SHARP LOCK:** ' + sl.pick.player + ' ' + sl.pick.propType + ' ' + sl.pick.line + (sl.note ? ' — ' + sl.note : ''));
+    lines.push('');
+  }
+  var report = lines.join('\n');
+  var blob = new Blob([report], { type: 'text/plain' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = 'mlb_edge_report_' + dateSuffix() + '.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function expSendFree() {
+  var hook = safeLoad('mlb_discord_free') || '';
+  if (!hook) { alert('Set Discord Free webhook in Data tab first.'); return; }
+  var elite = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE' || p.tier === 'STRONG'; });
+  var body = '🏆 **MLB EDGE — ' + new Date().toLocaleDateString() + '**\n';
+  elite.slice(0, 5).forEach(function(p) {
+    body += (p.tier === 'ELITE' ? '🔥' : '⭐') + ' ' + p.player + ' ' + p.propType + ' ' + p.line + ' (' + (p.edge >= 0 ? '+' : '') + p.edge + '%)\n';
+  });
+  fetch(hook, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: body }) })
+    .then(function() { showStatus('discord-status', '✓ Sent to Free channel.', 'success'); })
+    .catch(function(e) { showStatus('discord-status', '✗ Send failed: ' + e.message, 'error'); });
+}
+
+function expSendPaid() {
+  var hook = safeLoad('mlb_discord_paid') || '';
+  if (!hook) { alert('Set Discord Paid webhook in Data tab first.'); return; }
+  var elite = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE'; });
+  var body = '🔒 **MLB SHARP LOCK — ' + new Date().toLocaleDateString() + '** (PAID)\n';
+  if (MODEL_DATA && MODEL_DATA.sharpLock && MODEL_DATA.sharpLock.pick) {
+    var sl = MODEL_DATA.sharpLock;
+    body += '🔑 ' + sl.pick.player + ' ' + sl.pick.propType + ' ' + sl.pick.line + (sl.note ? '\n> ' + sl.note : '') + '\n\n';
+  }
+  elite.forEach(function(p) {
+    body += '🔥 ' + p.player + ' ' + p.propType + ' ' + p.line + ' (' + (p.edge >= 0 ? '+' : '') + p.edge + '%)\n';
+  });
+  fetch(hook, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: body }) })
+    .then(function() { showStatus('discord-status', '✓ Sent to Paid channel.', 'success'); })
+    .catch(function(e) { showStatus('discord-status', '✗ Send failed: ' + e.message, 'error'); });
+}
+
+function saveAff() {
+  ['aff-link','aff-cta','aff-partner'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) safeSave('mlb_' + id.replace('-','_'), el.value);
+  });
+  showStatus('aff-status', '✓ Affiliate settings saved.', 'success');
+}
+
+function showStatus(id, msg, type) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'status-box ' + (type === 'success' ? 'status-success' : type === 'error' ? 'status-error' : 'status-warning');
+  el.style.display = 'block';
+}
+
+function dateSuffix() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/* ---------- Thumbnail (Step 3) ---------- */
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function generateThumbnail() {
+  var canvas = document.getElementById('thumb-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = 1280, H = 720;
+  canvas.width = W; canvas.height = H;
+
+  // Background
+  var grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0a0e1a');
+  grad.addColorStop(1, '#0f1629');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Gold borders top/bottom
+  ctx.fillStyle = '#2979c8';
+  ctx.fillRect(0, 0, W, 8);
+  ctx.fillRect(0, H - 8, W, 8);
+
+  // Side accent lines
+  ctx.fillStyle = 'rgba(41,121,200,0.3)';
+  ctx.fillRect(0, 8, 4, H - 16);
+  ctx.fillRect(W - 4, 8, 4, H - 16);
+
+  // Date
+  var dateStr = (document.getElementById('thumb-date') || {}).value || new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.fillStyle = '#2979c8';
+  ctx.textAlign = 'center';
+  ctx.fillText(dateStr.toUpperCase(), W / 2, 80);
+
+  // Title
+  var headline = (document.getElementById('thumb-headline') || {}).value || 'THE EDGE REPORT';
+  ctx.font = 'bold 96px Arial, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(headline.toUpperCase(), W / 2, 200);
+
+  // Subtitle line
+  ctx.font = '36px Arial, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('MLB DAILY PICKS · POWERED BY THE EDGE MODEL', W / 2, 260);
+
+  // Top pick box
+  var topPick = PICKS_DATA.find(function(p) { return p.tier === 'ELITE'; }) ||
+                PICKS_DATA.find(function(p) { return p.tier === 'STRONG'; }) ||
+                PICKS_DATA[0];
+  if (topPick) {
+    roundRect(ctx, 140, 310, W - 280, 200, 12);
+    ctx.fillStyle = 'rgba(41,121,200,0.12)';
+    ctx.fill();
+    ctx.strokeStyle = '#2979c8';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.fillStyle = '#2979c8';
+    ctx.fillText('🔒 SHARP LOCK', W / 2, 355);
+
+    ctx.font = 'bold 52px Arial, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(topPick.player, W / 2, 430);
+
+    ctx.font = 'bold 36px Arial, sans-serif';
+    ctx.fillStyle = '#2979c8';
+    ctx.fillText('OVER ' + topPick.line + ' ' + topPick.propType.toUpperCase() + '  ·  ' + fmtOdds(topPick.odds), W / 2, 480);
+  }
+
+  // Stats row
+  var eliteCount = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE'; }).length;
+  var strongCount = PICKS_DATA.filter(function(p) { return p.tier === 'STRONG'; }).length;
+  var statItems = [
+    { label: 'ELITE', val: eliteCount, color: '#ff6b1a' },
+    { label: 'STRONG', val: strongCount, color: '#2979c8' },
+    { label: 'TOTAL PICKS', val: PICKS_DATA.filter(function(p){ return p.tier !== 'SKIP'; }).length, color: '#fff' }
+  ];
+  var boxW = 240, boxH = 90, boxY = 548, gapX = (W - statItems.length * boxW - (statItems.length - 1) * 20) / 2;
+  statItems.forEach(function(s, i) {
+    var bx = gapX + i * (boxW + 20);
+    roundRect(ctx, bx, boxY, boxW, boxH, 8);
+    ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.fill();
+    ctx.strokeStyle = s.color; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = 'bold 42px Arial, sans-serif';
+    ctx.fillStyle = s.color; ctx.fillText(s.val, bx + boxW / 2, boxY + 52);
+    ctx.font = '16px Arial, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fillText(s.label, bx + boxW / 2, boxY + 76);
+  });
+
+  // Branding
+  ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.fillStyle = 'rgba(41,121,200,0.7)';
+  ctx.fillText('THE EDGE REPORT  ·  MLB EDITION', W / 2, H - 24);
+
+  // Scale to preview canvas
+  var preview = document.getElementById('thumb-preview');
+  if (preview) {
+    preview.width = 640; preview.height = 360;
+    var pCtx = preview.getContext('2d');
+    pCtx.drawImage(canvas, 0, 0, 640, 360);
+  }
+}
+
+function downloadThumb() {
+  generateThumbnail();
+  var canvas = document.getElementById('thumb-canvas');
+  if (!canvas) return;
+  var a = document.createElement('a');
+  a.download = 'mlb_edge_thumb_' + dateSuffix() + '.png';
+  a.href = canvas.toDataURL('image/png');
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+/* ---------- HeyGen (Step 4) ---------- */
+
+function heyGenBuildScript() {
+  var elite = PICKS_DATA.filter(function(p) { return p.tier === 'ELITE'; });
+  var strong = PICKS_DATA.filter(function(p) { return p.tier === 'STRONG'; });
+  var lines = [
+    "What's up everyone, welcome back to The Edge Report — your daily MLB sharp picks powered by The Edge Model.",
+    "Let's get into today's locks.",
+    ""
+  ];
+  if (elite.length) {
+    lines.push("Starting with today's ELITE plays — these are the highest-confidence picks:");
+    elite.slice(0, 3).forEach(function(p) {
+      lines.push(p.player + " — " + p.propType + " over " + p.line + " — edge of " + (p.edge >= 0 ? 'plus ' : '') + Math.abs(p.edge) + " percent.");
+    });
+    lines.push("");
+  }
+  if (strong.length) {
+    lines.push("Now for our STRONG plays:");
+    strong.slice(0, 3).forEach(function(p) {
+      lines.push(p.player + " — " + p.propType + " over " + p.line + ".");
+    });
+    lines.push("");
+  }
+  lines.push("Follow the link in bio for the full Edge Report. Let's run it.");
+  var el = document.getElementById('heygen-script');
+  if (el) el.value = lines.join('\n');
+}
+
+function heyGenGenerate(videoType) {
+  var apiKey = safeLoad('mlb_heygen_key') || '';
+  var templateId = safeLoad('mlb_heygen_template') || '';
+  var avatarId = safeLoad('mlb_heygen_avatar') || '';
+  var voiceId = safeLoad('mlb_heygen_voice') || '';
+  if (!apiKey) { alert('HeyGen API key not set in Data tab.'); return; }
+  if (!templateId) { alert('HeyGen Template ID not set in Data tab.'); return; }
+  var script = (document.getElementById('heygen-script') || {}).value || 'The Edge Report — top picks for today.';
+  var dimensions = videoType === 'short' ? { width: 1080, height: 1920 } : { width: 1920, height: 1080 };
+  var payload = {
+    test: false,
+    variables: {
+      script: { name: 'script', type: 'text', properties: { content: script } }
+    }
+  };
+  if (avatarId) payload.variables.avatar_id = { name: 'avatar_id', type: 'text', properties: { content: avatarId } };
+  if (voiceId) payload.variables.voice_id = { name: 'voice_id', type: 'text', properties: { content: voiceId } };
+  payload.dimension = dimensions;
+
+  var statusEl = document.getElementById('heygen-gen-status');
+  if (statusEl) { statusEl.textContent = 'Submitting to HeyGen...'; statusEl.className = 'status-box status-warning'; }
+
+  fetch('https://api.heygen.com/v2/template/' + templateId + '/generate', {
+    method: 'POST',
+    headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data && data.data && data.data.video_id) {
+      if (statusEl) {
+        statusEl.innerHTML = '✓ Video submitted! ID: <b>' + data.data.video_id + '</b> — Check HeyGen dashboard.';
+        statusEl.className = 'status-box status-success';
+      }
+    } else {
+      if (statusEl) {
+        statusEl.textContent = '✗ HeyGen response: ' + JSON.stringify(data);
+        statusEl.className = 'status-box status-error';
+      }
+    }
+  })
+  .catch(function(e) {
+    if (statusEl) { statusEl.textContent = '✗ Error: ' + e.message; statusEl.className = 'status-box status-error'; }
+  });
+}
+
+/* ---------- Slideshow (Step 5) ---------- */
+
+function buildSlideshowHTML(picks) {
+  var elite = picks.filter(function(p) { return p.tier === 'ELITE'; });
+  var strong = picks.filter(function(p) { return p.tier === 'STRONG'; });
+  var dateStr = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  var slides = [];
+
+  // Cover slide
+  slides.push('<div class="slide slide-cover"><div class="slide-content">' +
+    '<div class="slide-brand">THE EDGE REPORT</div>' +
+    '<div class="slide-date">' + dateStr + '</div>' +
+    '<div class="slide-subtitle">MLB DAILY PICKS</div>' +
+    '<div class="slide-counts">' +
+      '<span class="sc elite">' + elite.length + ' ELITE</span>' +
+      '<span class="sc strong">' + strong.length + ' STRONG</span>' +
+    '</div>' +
+  '</div></div>');
+
+  // Pick slides
+  picks.filter(function(p) { return p.tier !== 'SKIP'; }).slice(0, 10).forEach(function(p, i) {
+    var edgeSign = p.edge >= 0 ? '+' : '';
+    slides.push('<div class="slide slide-pick">' +
+      '<div class="slide-content">' +
+        '<div class="slide-num">' + (i + 1) + ' / ' + Math.min(picks.filter(function(x){ return x.tier !== 'SKIP'; }).length, 10) + '</div>' +
+        '<div class="slide-tier tier-' + p.tier + '">' + p.tier + '</div>' +
+        '<div class="slide-player">' + esc(p.player) + '</div>' +
+        '<div class="slide-prop">' + esc(p.propType) + ' OVER ' + p.line + '</div>' +
+        '<div class="slide-edge">' + edgeSign + p.edge + '% EDGE</div>' +
+        '<div class="slide-book">' + esc(p.book.toUpperCase()) + ' · ' + fmtOdds(p.odds) + '</div>' +
+      '</div>' +
+    '</div>');
+  });
+
+  // CTA slide
+  var affLink = safeLoad('mlb_aff_link') || '';
+  var affCta = safeLoad('mlb_aff_cta') || 'Get the full Edge Report';
+  slides.push('<div class="slide slide-cta"><div class="slide-content">' +
+    '<div class="slide-brand">THE EDGE REPORT</div>' +
+    '<div class="slide-cta-text">' + esc(affCta) + '</div>' +
+    (affLink ? '<div class="slide-link">' + esc(affLink) + '</div>' : '') +
+  '</div></div>');
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>MLB Edge Slideshow — ' + dateStr + '</title>' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{background:#000;color:#fff;font-family:Arial,sans-serif;height:100vh;overflow:hidden}' +
+    '.slideshow{width:100%;height:100vh;position:relative}' +
+    '.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:none;' +
+      'background:linear-gradient(135deg,#0a0e1a 0%,#0f1629 100%);' +
+      'border-top:6px solid #2979c8;border-bottom:6px solid #2979c8}' +
+    '.slide.active{display:flex;align-items:center;justify-content:center}' +
+    '.slide-content{text-align:center;padding:40px}' +
+    '.slide-brand{font-size:2.5em;font-weight:900;color:#2979c8;letter-spacing:4px}' +
+    '.slide-date{color:rgba(255,255,255,.6);margin:8px 0;font-size:1.1em}' +
+    '.slide-subtitle{font-size:1.4em;font-weight:bold;margin:12px 0}' +
+    '.slide-counts{margin-top:24px;display:flex;gap:20px;justify-content:center}' +
+    '.sc{padding:8px 20px;border-radius:20px;font-weight:bold}' +
+    '.sc.elite{background:#ff6b1a;color:#fff}.sc.strong{background:#2979c8;color:#000}' +
+    '.slide-num{font-size:.9em;color:rgba(255,255,255,.4);margin-bottom:12px}' +
+    '.slide-tier{display:inline-block;padding:6px 18px;border-radius:20px;font-weight:900;letter-spacing:2px;margin-bottom:16px}' +
+    '.tier-ELITE{background:#ff6b1a;color:#fff}.tier-STRONG{background:#2979c8;color:#000}' +
+    '.tier-LEAN{background:#4fc3f7;color:#000}' +
+    '.slide-player{font-size:3em;font-weight:900;margin:8px 0}' +
+    '.slide-prop{font-size:1.8em;font-weight:bold;color:#2979c8;margin:8px 0}' +
+    '.slide-edge{font-size:1.4em;color:#fff;margin:8px 0}' +
+    '.slide-book{font-size:1em;color:rgba(255,255,255,.5);margin-top:12px}' +
+    '.slide-cta-text{font-size:2em;font-weight:bold;margin:20px 0}' +
+    '.slide-link{color:#2979c8;font-size:1.2em;margin-top:12px}' +
+    '.nav{position:fixed;bottom:20px;width:100%;display:flex;justify-content:center;gap:16px;z-index:100}' +
+    '.nav button{background:rgba(41,121,200,.2);border:1px solid #2979c8;color:#fff;' +
+      'padding:10px 24px;border-radius:8px;cursor:pointer;font-size:1em}' +
+    '.nav button:hover{background:#2979c8;color:#000}' +
+    '.progress{position:fixed;top:0;left:0;height:4px;background:#2979c8;transition:width .3s}' +
+    '</style></head><body>' +
+    '<div class="progress" id="prog"></div>' +
+    '<div class="slideshow" id="ss">' + slides.join('') + '</div>' +
+    '<div class="nav">' +
+      '<button onclick="prev()">◀ Prev</button>' +
+      '<span id="slide-label" style="color:#2979c8;line-height:40px;font-size:.9em"></span>' +
+      '<button onclick="next()">Next ▶</button>' +
+    '</div>' +
+    '<script>' +
+    'var cur=0;var slides=document.querySelectorAll(".slide");var total=slides.length;' +
+    'function show(n){slides[cur].classList.remove("active");cur=(n+total)%total;slides[cur].classList.add("active");' +
+      'document.getElementById("prog").style.width=((cur+1)/total*100)+"%";' +
+      'document.getElementById("slide-label").textContent=(cur+1)+" / "+total;}' +
+    'function next(){show(cur+1);}function prev(){show(cur-1);}' +
+    'document.addEventListener("keydown",function(e){if(e.key==="ArrowRight")next();if(e.key==="ArrowLeft")prev();});' +
+    'show(0);' +
+    '<\/script></body></html>';
+}
+
+function buildSlideshow() {
+  _SLIDESHOW_HTML = buildSlideshowHTML(PICKS_DATA);
+  var w = window.open('', '_blank');
+  if (w) { w.document.write(_SLIDESHOW_HTML); w.document.close(); }
+  var st = document.getElementById('slideshow-status');
+  if (st) { st.textContent = '✓ Slideshow opened in new tab (' + PICKS_DATA.filter(function(p){return p.tier!=='SKIP';}).length + ' picks).'; st.className = 'status-box status-success'; }
+}
+
+function downloadSlideshow() {
+  if (!_SLIDESHOW_HTML) _SLIDESHOW_HTML = buildSlideshowHTML(PICKS_DATA);
+  var blob = new Blob([_SLIDESHOW_HTML], { type: 'text/html' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.download = 'mlb_edge_slideshow_' + dateSuffix() + '.html';
+  a.href = url;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+/* ============================================================
+   STAGE 2 ENGINE — PART 4: Calendar (from v1.1 verbatim)
+   ============================================================ */
+
+var CAL_YEAR = 2026;
+var CAL_MONTH = 9; // 0-indexed = October
+var CUSTOM_TASKS = [];
+try { CUSTOM_TASKS = JSON.parse(localStorage.getItem('mlb_cal_tasks') || '[]'); } catch(e) {}
+
+var MLB_SCHEDULE_EVENTS = [
+  {date:'2026-10-14',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-15',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-16',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-17',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-18',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-19',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-20',label:'ALCS/NLCS',type:'season'},
+  {date:'2026-10-21',label:'World Series',type:'season'},
+  {date:'2026-10-22',label:'World Series',type:'season'},
+  {date:'2026-10-23',label:'World Series',type:'season'},
+  {date:'2026-10-24',label:'World Series',type:'season'},
+  {date:'2026-10-25',label:'World Series',type:'season'},
+  {date:'2026-10-26',label:'World Series',type:'season'},
+  {date:'2026-10-27',label:'World Series',type:'season'},
+  {date:'2026-10-28',label:'World Series',type:'season'},
+  {date:'2026-10-29',label:'World Series',type:'season'},
+  {date:'2026-10-30',label:'World Series',type:'season'},
+  {date:'2026-10-31',label:'World Series',type:'season'},
+  {date:'2026-11-01',label:'World Series',type:'season'},
+  {date:'2026-10-15',label:'Data Pull',type:'task'},
+  {date:'2026-10-16',label:'Data Pull',type:'task'},
+  {date:'2026-10-17',label:'Data Pull',type:'task'},
+  {date:'2026-10-18',label:'Data Pull',type:'task'},
+  {date:'2026-10-19',label:'Data Pull',type:'task'},
+  {date:'2026-10-20',label:'Data Pull',type:'task'},
+  {date:'2026-10-21',label:'Data Pull',type:'task'}
+];
+
+function renderCalendar() {
+  var container = document.getElementById('cal-grid');
+  if (!container) return;
+  var year = CAL_YEAR, month = CAL_MONTH;
+  var firstDay = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  var today = new Date();
+  var todayStr = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  var monthNames = ['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  var titleEl = document.getElementById('cal-title');
+  if (titleEl) titleEl.textContent = monthNames[month] + ' ' + year;
+
+  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var html = '<div class="cal-day-headers">' +
+    dayNames.map(function(d) { return '<div class="cal-hdr">' + d + '</div>'; }).join('') +
+  '</div><div class="cal-days">';
+
+  // Empty cells before first day
+  for (var i = 0; i < firstDay; i++) {
+    html += '<div class="cal-cell cal-empty"></div>';
+  }
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    var isToday = dateStr === todayStr;
+    var events = MLB_SCHEDULE_EVENTS.filter(function(e) { return e.date === dateStr; });
+    var tasks = CUSTOM_TASKS.filter(function(t) { return t.date === dateStr; });
+
+    html += '<div class="cal-cell' + (isToday ? ' cal-today' : '') + '">' +
+      '<div class="cal-day-num">' + d + '</div>';
+
+    events.forEach(function(ev) {
+      html += '<div class="cal-event ev-' + ev.type + '">' + esc(ev.label) + '</div>';
+    });
+    tasks.forEach(function(t, ti) {
+      html += '<div class="cal-event ev-task" onclick="removeCalTask(\'' + dateStr + '\',' + ti + ')">' +
+        esc(t.label) + ' ✕</div>';
+    });
+
+    html += '</div>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function calShift(delta) {
+  CAL_MONTH += delta;
+  if (CAL_MONTH > 11) { CAL_MONTH = 0; CAL_YEAR++; }
+  if (CAL_MONTH < 0) { CAL_MONTH = 11; CAL_YEAR--; }
+  renderCalendar();
+}
+
+function calToday() {
+  var now = new Date();
+  CAL_YEAR = now.getFullYear();
+  CAL_MONTH = now.getMonth();
+  renderCalendar();
+}
+
+function calAddTask() {
+  var dateEl = document.getElementById('cal-task-date');
+  var labelEl = document.getElementById('cal-task-label');
+  if (!dateEl || !labelEl) return;
+  var dateVal = dateEl.value.trim();
+  var labelVal = labelEl.value.trim();
+  if (!dateVal || !labelVal) { alert('Date and label required.'); return; }
+  CUSTOM_TASKS.push({ date: dateVal, label: labelVal });
+  try { localStorage.setItem('mlb_cal_tasks', JSON.stringify(CUSTOM_TASKS)); } catch(e) {}
+  dateEl.value = ''; labelEl.value = '';
+  renderCalendar();
+}
+
+function removeCalTask(dateStr, taskIdx) {
+  var dayTasks = CUSTOM_TASKS.filter(function(t) { return t.date === dateStr; });
+  var toRemove = dayTasks[taskIdx];
+  if (!toRemove) return;
+  CUSTOM_TASKS = CUSTOM_TASKS.filter(function(t) {
+    return !(t.date === toRemove.date && t.label === toRemove.label);
+  });
+  try { localStorage.setItem('mlb_cal_tasks', JSON.stringify(CUSTOM_TASKS)); } catch(e) {}
+  renderCalendar();
+}
+
+/* ============================================================
+   END OF MLB EDGE MODEL v1.2 ENGINE
+   ============================================================ */
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  MODEL LAB — v1.3                                           ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+// ── GLOBALS ───────────────────────────────────────────────────
+var LAB_BT_DATA = [];   // graded backtest rows
+var LAB_TRACKER = [];   // manually logged pick history
+var LAB_WEIGHTS = {     // model weight adjustments
+  lineBlend: 50,        // 0=pure stats, 100=pure line
+  parkFactor: 100,      // multiplier x100 (100=1.0x)
+  pitcherWeight: 100,   // x100
+  formWeight: 100       // L10 recent form x100
+};
+var LAB_CAL = {         // tier calibration
+  eliteMin: 8,
+  strongMin: 4,
+  leanMin: 1
+};
+
+// ── SECTION SWITCHER ──────────────────────────────────────────
+function renderLabTab() {
+  labLoadState();
+  labRenderTracker();
+  labRenderCalibration();
+  labRestoreWeights();
+  var todayStr = new Date().toISOString().split('T')[0];
+  var dtEl = document.getElementById('lab-tr-date');
+  if (dtEl && !dtEl.value) dtEl.value = todayStr;
+  var cfEl = document.getElementById('lab-cal-file');
+  if (cfEl && !cfEl.value) cfEl.value = safeLoad('mlb_lab_cal_file') || 'mlb_calibration.json';
+}
+
+function labShowSection(s) {
+  document.querySelectorAll('.lab-section').forEach(function(el){ el.style.display='none'; });
+  document.querySelectorAll('.lab-nav').forEach(function(b){ b.classList.remove('active'); });
+  var sec = document.getElementById('lab-sec-'+s);
+  if (sec) sec.style.display='';
+  var nav = document.querySelector('.lab-nav[data-sec="'+s+'"]');
+  if (nav) nav.classList.add('active');
+}
+
+function labLoadState() {
+  var saved = safeLoad('mlb_lab_tracker');
+  if (saved) { try { LAB_TRACKER = JSON.parse(saved); } catch(e){} }
+  var savedW = safeLoad('mlb_lab_weights');
+  if (savedW) { try { LAB_WEIGHTS = JSON.parse(savedW); } catch(e){} }
+  var savedC = safeLoad('mlb_lab_cal');
+  if (savedC) { try { LAB_CAL = JSON.parse(savedC); } catch(e){} }
+}
+
+// ── BACKTEST ──────────────────────────────────────────────────
+function labUploadBacktest(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('lab-bt-paste').value = e.target.result;
+    showStatus('lab-bt-status', '📁 File loaded — click "Grade Picks" to process.', 'info');
+  };
+  reader.readAsText(file);
+}
+
+function labGradeBacktest() {
+  var raw = document.getElementById('lab-bt-paste').value.trim();
+  if (!raw) { showStatus('lab-bt-status','❌ No data to grade. Paste CSV or upload a file.','err'); return; }
+  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  if (lines.length < 2) { showStatus('lab-bt-status','❌ CSV must have a header row and at least one data row.','err'); return; }
+
+  // Parse header
+  var hdr = lines[0].toLowerCase().split(',').map(function(h){ return h.trim(); });
+  var colMap = {};
+  ['date','player','proptype','line','side','actual'].forEach(function(req){
+    var idx = hdr.indexOf(req);
+    if (idx === -1) idx = hdr.indexOf(req.replace('proptype','prop_type'));
+    if (idx === -1) idx = hdr.indexOf(req.replace('proptype','type'));
+    colMap[req] = idx;
+  });
+  var missing = ['date','player','proptype','line','side','actual'].filter(function(c){ return colMap[c] === -1; });
+  if (missing.length) { showStatus('lab-bt-status','❌ Missing columns: '+missing.join(', ')+'. Required: date, player, propType, line, side, actual','err'); return; }
+
+  LAB_BT_DATA = [];
+  var errors = 0;
+  for (var i = 1; i < lines.length; i++) {
+    var cols = lines[i].split(',').map(function(c){ return c.trim(); });
+    var date = cols[colMap['date']] || '';
+    var player = cols[colMap['player']] || '';
+    var propType = (cols[colMap['proptype']] || '').toUpperCase();
+    var line = parseFloat(cols[colMap['line']]);
+    var side = (cols[colMap['side']] || '').toLowerCase();
+    var actual = parseFloat(cols[colMap['actual']]);
+    if (!player || isNaN(line) || isNaN(actual)) { errors++; continue; }
+
+    // Find projection from PICKS_DATA
+    var matchPick = null;
+    for (var j = 0; j < PICKS_DATA.length; j++) {
+      var p = PICKS_DATA[j];
+      if (p.player && p.player.toLowerCase().indexOf(player.toLowerCase().split(' ').pop()) >= 0
+          && p.propType && p.propType.toUpperCase() === propType) {
+        matchPick = p; break;
+      }
+    }
+    var proj = matchPick ? matchPick.projection : null;
+    var edgePct = (proj !== null && line > 0) ? Math.round((proj/line - 1)*1000)/10 : null;
+    var tier = edgePct !== null ? assignTier(edgePct) : '—';
+
+    // Grade: model side = over if proj > line, under if proj < line
+    var modelSide = (proj !== null) ? (proj > line ? 'over' : 'under') : side;
+    var result;
+    if (actual === line) result = 'PUSH';
+    else if (side === 'over') result = actual > line ? 'WIN' : 'LOSS';
+    else result = actual < line ? 'WIN' : 'LOSS';
+
+    LAB_BT_DATA.push({date:date,player:player,propType:propType,line:line,side:side,proj:proj,edgePct:edgePct,tier:tier,actual:actual,result:result});
+  }
+
+  if (!LAB_BT_DATA.length) { showStatus('lab-bt-status','❌ No valid rows parsed. Check CSV format.','err'); return; }
+
+  var msg = '✅ Graded '+LAB_BT_DATA.length+' pick'+(LAB_BT_DATA.length===1?'':'s');
+  if (errors) msg += ' ('+errors+' row'+(errors===1?'':' rows')+' skipped)';
+  showStatus('lab-bt-status', msg, 'ok');
+  document.getElementById('lab-bt-export-btn').style.display='';
+  labRenderBtSummary();
+  labRenderBtTable();
+}
+
+function labRenderBtSummary() {
+  var card = document.getElementById('lab-bt-summary-card');
+  var tcard = document.getElementById('lab-bt-table-card');
+  if (card) card.style.display='';
+  if (tcard) tcard.style.display='';
+
+  var wins=0,losses=0,pushes=0;
+  LAB_BT_DATA.forEach(function(r){ if(r.result==='WIN')wins++; else if(r.result==='LOSS')losses++; else pushes++; });
+  var total = wins+losses+pushes;
+  var hitRate = total ? Math.round((wins/(wins+losses||1))*1000)/10 : 0;
+
+  // Tiles
+  var tilesEl = document.getElementById('lab-bt-summary-tiles');
+  if (tilesEl) tilesEl.innerHTML =
+    labTile(wins,'Wins','W','lab-win') +
+    labTile(losses,'Losses','L','lab-loss') +
+    labTile(pushes,'Pushes','P','lab-push') +
+    labTile(hitRate+'%','Hit Rate','(W/W+L)','');
+
+  // By prop type
+  var byType = {};
+  LAB_BT_DATA.forEach(function(r){
+    if (!byType[r.propType]) byType[r.propType]={w:0,l:0,p:0};
+    if (r.result==='WIN') byType[r.propType].w++;
+    else if (r.result==='LOSS') byType[r.propType].l++;
+    else byType[r.propType].p++;
+  });
+  var typeHtml = '<div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.4px;margin-bottom:8px;">BY PROP TYPE</div>';
+  Object.keys(byType).sort().forEach(function(t){
+    var d = byType[t];
+    var hr = d.w+d.l ? Math.round(d.w/(d.w+d.l)*1000)/10 : 0;
+    typeHtml += '<div class="bt-by-type-row"><span style="font-size:11px;font-weight:700;width:80px;flex-shrink:0;">'+t+'</span>' +
+      '<span style="font-size:11px;color:var(--green);">'+d.w+'W</span>&nbsp;' +
+      '<span style="font-size:11px;color:var(--red);">'+d.l+'L</span>&nbsp;' +
+      (d.p ? '<span style="font-size:11px;color:var(--text3);">'+d.p+'P</span>&nbsp;' : '') +
+      '<span style="font-size:11px;font-weight:700;color:'+labHitColor(hr)+';margin-left:8px;">'+hr+'%</span></div>';
+  });
+  var byTypeEl = document.getElementById('lab-bt-by-type');
+  if (byTypeEl) byTypeEl.innerHTML = typeHtml;
+
+  // By tier
+  var byTier = {ELITE:{w:0,l:0,p:0},STRONG:{w:0,l:0,p:0},LEAN:{w:0,l:0,p:0},SKIP:{w:0,l:0,p:0},'—':{w:0,l:0,p:0}};
+  LAB_BT_DATA.forEach(function(r){
+    var t = r.tier||'—';
+    if (!byTier[t]) byTier[t]={w:0,l:0,p:0};
+    if (r.result==='WIN') byTier[t].w++;
+    else if (r.result==='LOSS') byTier[t].l++;
+    else byTier[t].p++;
+  });
+  var tierHtml = '<div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.4px;margin-bottom:8px;">BY TIER</div>';
+  ['ELITE','STRONG','LEAN','SKIP'].forEach(function(t){
+    var d = byTier[t]; if (!d) return;
+    var tot = d.w+d.l+d.p; if (!tot) return;
+    var hr = d.w+d.l ? Math.round(d.w/(d.w+d.l)*1000)/10 : 0;
+    var tierColors = {ELITE:getComputedStyle(document.documentElement).getPropertyValue('--elite').trim()||'#ff6b35',
+      STRONG:'#2979c8',LEAN:'#4d9fff',SKIP:'#6b7fa3'};
+    var pct = total ? Math.round(tot/total*100) : 0;
+    tierHtml += '<div class="tier-bar-wrap"><span class="tier-bar-label" style="color:'+tierColors[t]+';">'+t+'</span>' +
+      '<div class="tier-bar-track"><div class="tier-bar-fill" style="width:'+pct+'%;background:'+tierColors[t]+';"></div></div>' +
+      '<span class="tier-bar-count">'+d.w+'W-'+d.l+'L&nbsp;<span style="color:'+labHitColor(hr)+';">'+hr+'%</span></span></div>';
+  });
+  var byTierEl = document.getElementById('lab-bt-by-tier');
+  if (byTierEl) byTierEl.innerHTML = tierHtml;
+}
+
+function labTile(val, label, sub, cls) {
+  return '<div class="lab-tile"><div class="lt-label">'+label+'</div>' +
+    '<div class="lt-val '+cls+'">'+val+'</div>' +
+    '<div class="lt-sub">'+sub+'</div></div>';
+}
+function labHitColor(hr) { return hr >= 55 ? 'var(--green)' : hr >= 50 ? 'var(--gold)' : 'var(--red)'; }
+
+function labRenderBtTable() {
+  var tbody = document.getElementById('lab-bt-tbody');
+  if (!tbody) return;
+  var filterType = (document.getElementById('lab-bt-filter-type')||{}).value || '';
+  var filterResult = (document.getElementById('lab-bt-filter-result')||{}).value || '';
+  var rows = LAB_BT_DATA.filter(function(r){
+    if (filterType && r.propType !== filterType) return false;
+    if (filterResult && r.result !== filterResult) return false;
+    return true;
+  });
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="10" style="padding:20px;text-align:center;color:var(--text3);">No rows match the filter.</td></tr>'; return; }
+  var tierColors = {ELITE:'var(--elite)',STRONG:'var(--gold)',LEAN:'var(--blue)',SKIP:'var(--text3)'};
+  tbody.innerHTML = rows.map(function(r){
+    var cls = r.result==='WIN'?'bt-row-win':r.result==='LOSS'?'bt-row-loss':'bt-row-push';
+    var edgeStr = r.edgePct !== null ? (r.edgePct > 0 ? '+' : '')+r.edgePct+'%' : '—';
+    var projStr = r.proj !== null ? r.proj.toFixed(1) : '—';
+    var tierClr = tierColors[r.tier] || 'var(--text3)';
+    return '<tr class="'+cls+'" style="border-bottom:1px solid var(--border);">'+
+      '<td style="padding:7px 10px;color:var(--text3);">'+r.date+'</td>'+
+      '<td style="padding:7px 10px;">'+r.player+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;font-weight:700;">'+r.propType+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;">'+r.line+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;text-transform:capitalize;">'+r.side+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;color:var(--text2);">'+projStr+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;color:var(--gold);">'+edgeStr+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;font-weight:700;color:'+tierClr+';">'+r.tier+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;">'+r.actual+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;font-weight:700;">'+r.result+'</td>'+
+      '</tr>';
+  }).join('');
+}
+
+function labClearBt() {
+  LAB_BT_DATA = [];
+  document.getElementById('lab-bt-paste').value = '';
+  document.getElementById('lab-bt-export-btn').style.display='none';
+  var sc = document.getElementById('lab-bt-summary-card');
+  var tc = document.getElementById('lab-bt-table-card');
+  if (sc) sc.style.display='none';
+  if (tc) tc.style.display='none';
+  showStatus('lab-bt-status','🗑 Cleared.','info');
+}
+
+function labExportBt() {
+  if (!LAB_BT_DATA.length) return;
+  var hdr = 'date,player,propType,line,side,projection,edgePct,tier,actual,result';
+  var rows = LAB_BT_DATA.map(function(r){
+    return [r.date,r.player,r.propType,r.line,r.side,
+      r.proj!==null?r.proj:'',r.edgePct!==null?r.edgePct:'',r.tier,r.actual,r.result].join(',');
+  });
+  var csv = hdr+'\n'+rows.join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'mlb_backtest_graded_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
+// ── TIER CALIBRATION ──────────────────────────────────────────
+function labRenderCalibration() {
+  var cal = LAB_CAL;
+  var eEl = document.getElementById('lab-cal-elite');
+  var sEl = document.getElementById('lab-cal-strong');
+  var lEl = document.getElementById('lab-cal-lean');
+  if (eEl) eEl.value = cal.eliteMin;
+  if (sEl) sEl.value = cal.strongMin;
+  if (lEl) lEl.value = cal.leanMin;
+  labPreviewCalibration();
+}
+
+function labPreviewCalibration() {
+  var eliteMin = parseFloat(document.getElementById('lab-cal-elite').value) || 8;
+  var strongMin = parseFloat(document.getElementById('lab-cal-strong').value) || 4;
+  var leanMin = parseFloat(document.getElementById('lab-cal-lean').value) || 1;
+  var counts = {ELITE:0,STRONG:0,LEAN:0,SKIP:0};
+  PICKS_DATA.forEach(function(p){
+    var e = p.edge||0;
+    if (e >= eliteMin) counts.ELITE++;
+    else if (e >= strongMin) counts.STRONG++;
+    else if (e >= leanMin) counts.LEAN++;
+    else counts.SKIP++;
+  });
+  var total = PICKS_DATA.length;
+  var fmt = function(t){ return counts[t]+' pick'+(counts[t]===1?'':'s')+(total?' ('+Math.round(counts[t]/total*100)+'%)':''); };
+  var eC = document.getElementById('lab-cal-elite-count');
+  var sC = document.getElementById('lab-cal-strong-count');
+  var lC = document.getElementById('lab-cal-lean-count');
+  if (eC) eC.textContent = fmt('ELITE');
+  if (sC) sC.textContent = fmt('STRONG');
+  if (lC) lC.textContent = fmt('LEAN');
+
+  // Distribution bars
+  var dist = document.getElementById('lab-cal-dist');
+  if (!dist) return;
+  if (!total) { dist.innerHTML = '<span style="color:var(--text3);font-size:12px;">No props loaded — go to Data tab and load data first.</span>'; return; }
+  var tierColors = {ELITE:'var(--elite)',STRONG:'var(--gold)',LEAN:'var(--blue)',SKIP:'var(--text3)'};
+  dist.innerHTML = ['ELITE','STRONG','LEAN','SKIP'].map(function(t){
+    var pct = Math.round(counts[t]/total*100);
+    return '<div class="tier-bar-wrap"><span class="tier-bar-label" style="color:'+tierColors[t]+';">'+t+'</span>' +
+      '<div class="tier-bar-track"><div class="tier-bar-fill" style="width:'+pct+'%;background:'+tierColors[t]+';"></div></div>' +
+      '<span class="tier-bar-count">'+counts[t]+' ('+pct+'%)</span></div>';
+  }).join('');
+}
+
+function labApplyCalibration() {
+  var eliteMin = parseFloat(document.getElementById('lab-cal-elite').value);
+  var strongMin = parseFloat(document.getElementById('lab-cal-strong').value);
+  var leanMin = parseFloat(document.getElementById('lab-cal-lean').value);
+  if (isNaN(eliteMin)||isNaN(strongMin)||isNaN(leanMin)) {
+    showStatus('lab-cal-status','❌ Invalid threshold values.','err'); return;
+  }
+  if (eliteMin <= strongMin || strongMin <= leanMin) {
+    showStatus('lab-cal-status','❌ Thresholds must be in order: ELITE > STRONG > LEAN.','err'); return;
+  }
+  LAB_CAL = {eliteMin:eliteMin, strongMin:strongMin, leanMin:leanMin};
+  safeSave('mlb_lab_cal', JSON.stringify(LAB_CAL));
+  // Re-score all picks with new thresholds
+  PICKS_DATA.forEach(function(p){
+    p.tier = p.edge >= eliteMin ? 'ELITE' : p.edge >= strongMin ? 'STRONG' : p.edge >= leanMin ? 'LEAN' : 'SKIP';
+  });
+  showStatus('lab-cal-status','✅ Calibration applied — '+PICKS_DATA.length+' props re-tiered. Thresholds: ELITE≥'+eliteMin+'% STRONG≥'+strongMin+'% LEAN≥'+leanMin+'%','ok');
+  labPreviewCalibration();
+}
+
+function labResetCalibration() {
+  LAB_CAL = {eliteMin:8, strongMin:4, leanMin:1};
+  safeSave('mlb_lab_cal', JSON.stringify(LAB_CAL));
+  labRenderCalibration();
+  PICKS_DATA.forEach(function(p){
+    p.tier = assignTier(p.edge||0);
+  });
+  showStatus('lab-cal-status','↺ Reset to defaults (ELITE≥8% STRONG≥4% LEAN≥1%).','info');
+}
+
+function labPushCalibration() {
+  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB_Data_Pull';
+  var pat  = safeLoad('mlb_github_pat');
+  var file = (document.getElementById('lab-cal-file').value||'').trim() || 'mlb_calibration.json';
+  safeSave('mlb_lab_cal_file', file);
+  if (!pat) { showStatus('lab-cal-gh-status','❌ No GitHub PAT saved. Set it in the Data tab first.','err'); return; }
+  var payload = JSON.stringify({
+    tierThresholds: LAB_CAL,
+    weights: LAB_WEIGHTS,
+    updatedAt: new Date().toISOString(),
+    version: MLB_EDGE_VERSION
+  }, null, 2);
+  showStatus('lab-cal-gh-status','⏳ Pushing calibration to GitHub…','info');
+  var apiUrl = 'https://api.github.com/repos/'+repo+'/contents/'+file;
+  // Get current SHA first (needed for update)
+  fetch(apiUrl, {headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(existing){
+      var body = {
+        message: 'Update MLB calibration '+new Date().toISOString().split('T')[0],
+        content: btoa(unescape(encodeURIComponent(payload))),
+        branch: 'main'
+      };
+      if (existing && existing.sha) body.sha = existing.sha;
+      return fetch(apiUrl, {
+        method:'PUT',
+        headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+    .then(function(res){
+      if (res.ok) showStatus('lab-cal-gh-status','✅ Calibration pushed to '+repo+'/'+file,'ok');
+      else showStatus('lab-cal-gh-status','❌ Push failed: '+(res.data.message||'Unknown error'),'err');
+    })
+    .catch(function(e){ showStatus('lab-cal-gh-status','❌ Error: '+e.message,'err'); });
+}
+
+function labPullCalibration() {
+  var repo = safeLoad('mlb_github_repo') || 'Gatorz1989/MLB_Data_Pull';
+  var pat  = safeLoad('mlb_github_pat');
+  var file = (document.getElementById('lab-cal-file').value||'').trim() || 'mlb_calibration.json';
+  var headers = {}; if (pat) headers['Authorization'] = 'token '+pat;
+  showStatus('lab-cal-gh-status','⏳ Pulling calibration from GitHub…','info');
+  function tryBranch(b){
+    return fetch('https://raw.githubusercontent.com/'+repo+'/'+b+'/'+file, {headers:headers})
+      .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+  }
+  tryBranch('main').catch(function(){ return tryBranch('master'); })
+    .then(function(data){
+      if (data.tierThresholds) {
+        LAB_CAL = data.tierThresholds;
+        safeSave('mlb_lab_cal', JSON.stringify(LAB_CAL));
+        labRenderCalibration();
+      }
+      if (data.weights) {
+        LAB_WEIGHTS = data.weights;
+        safeSave('mlb_lab_weights', JSON.stringify(LAB_WEIGHTS));
+        labRestoreWeights();
+      }
+      showStatus('lab-cal-gh-status','✅ Calibration pulled from '+repo+'/'+file+' (updated '+((data.updatedAt||'').split('T')[0]||'—')+')','ok');
+    })
+    .catch(function(e){ showStatus('lab-cal-gh-status','❌ Pull failed: '+e.message,'err'); });
+}
+
+// ── SEASON TRACKER ────────────────────────────────────────────
+function labLogPick() {
+  var date   = (document.getElementById('lab-tr-date').value||'').trim();
+  var player = (document.getElementById('lab-tr-player').value||'').trim();
+  var type   = document.getElementById('lab-tr-type').value;
+  var line   = parseFloat(document.getElementById('lab-tr-line').value);
+  var side   = document.getElementById('lab-tr-side').value;
+  var actual = parseFloat(document.getElementById('lab-tr-actual').value);
+  var tier   = document.getElementById('lab-tr-tier').value;
+
+  if (!player || !date || isNaN(line) || isNaN(actual)) {
+    showStatus('lab-tr-log-status','❌ Fill in all fields (date, player, line, actual).','err'); return;
+  }
+  var result;
+  if (actual === line) result = 'PUSH';
+  else if (side === 'over') result = actual > line ? 'WIN' : 'LOSS';
+  else result = actual < line ? 'WIN' : 'LOSS';
+
+  LAB_TRACKER.push({id:Date.now(), date:date, player:player, propType:type,
+    line:line, side:side, actual:actual, tier:tier, result:result});
+  safeSave('mlb_lab_tracker', JSON.stringify(LAB_TRACKER));
+  showStatus('lab-tr-log-status','✅ Logged: '+player+' '+type+' '+side+' '+line+' → '+result,'ok');
+  document.getElementById('lab-tr-player').value='';
+  document.getElementById('lab-tr-line').value='';
+  document.getElementById('lab-tr-actual').value='';
+  labRenderTracker();
+}
+
+function labRenderTracker() {
+  var loaded = safeLoad('mlb_lab_tracker');
+  if (loaded) { try { LAB_TRACKER = JSON.parse(loaded); } catch(e){} }
+  labRenderTrackerSummary();
+  labRenderTrackerTable();
+}
+
+function labRenderTrackerSummary() {
+  var sumEl = document.getElementById('lab-tr-summary');
+  if (!sumEl) return;
+  if (!LAB_TRACKER.length) {
+    sumEl.innerHTML = '<span style="color:var(--text3);font-size:12px;">No picks logged yet.</span>'; return;
+  }
+  var wins=0,losses=0,pushes=0;
+  LAB_TRACKER.forEach(function(r){ if(r.result==='WIN')wins++; else if(r.result==='LOSS')losses++; else pushes++; });
+  var hr = wins+losses ? Math.round(wins/(wins+losses)*1000)/10 : 0;
+  var byType = {};
+  LAB_TRACKER.forEach(function(r){
+    if (!byType[r.propType]) byType[r.propType]={w:0,l:0,p:0};
+    if (r.result==='WIN') byType[r.propType].w++;
+    else if (r.result==='LOSS') byType[r.propType].l++;
+    else byType[r.propType].p++;
+  });
+  var html = '<div class="grid-3" style="margin-bottom:14px;">' +
+    labTile(wins,'Wins','W','lab-win') +
+    labTile(losses,'Losses','L','lab-loss') +
+    labTile(hr+'%','Hit Rate','W/(W+L)','') +
+    '</div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.4px;margin-bottom:8px;">BY PROP TYPE</div>';
+  Object.keys(byType).sort().forEach(function(t){
+    var d = byType[t];
+    var thr = d.w+d.l ? Math.round(d.w/(d.w+d.l)*1000)/10 : 0;
+    html += '<div class="bt-by-type-row"><span style="font-size:11px;font-weight:700;width:80px;flex-shrink:0;">'+t+'</span>' +
+      '<span style="font-size:11px;color:var(--green);">'+d.w+'W</span>&nbsp;' +
+      '<span style="font-size:11px;color:var(--red);">'+d.l+'L</span>&nbsp;' +
+      (d.p?'<span style="font-size:11px;color:var(--text3);">'+d.p+'P</span>&nbsp;':'') +
+      '<span style="font-size:11px;font-weight:700;color:'+labHitColor(thr)+';margin-left:8px;">'+thr+'%</span></div>';
+  });
+  sumEl.innerHTML = html;
+}
+
+function labRenderTrackerTable() {
+  var tbody = document.getElementById('lab-tr-tbody');
+  var emptyEl = document.getElementById('lab-tr-empty');
+  if (!tbody) return;
+  var filter = (document.getElementById('lab-tr-filter')||{}).value || '';
+  var rows = LAB_TRACKER.filter(function(r){ return !filter || r.propType===filter; }).slice().reverse();
+  if (!rows.length) {
+    tbody.innerHTML=''; if(emptyEl) emptyEl.style.display='';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display='none';
+  var tierColors = {ELITE:'var(--elite)',STRONG:'var(--gold)',LEAN:'var(--blue)',SKIP:'var(--text3)'};
+  tbody.innerHTML = rows.map(function(r){
+    var rClr = r.result==='WIN'?'var(--green)':r.result==='LOSS'?'var(--red)':'var(--text3)';
+    return '<tr style="border-bottom:1px solid var(--border);">'+
+      '<td style="padding:7px 10px;color:var(--text3);">'+r.date+'</td>'+
+      '<td style="padding:7px 10px;">'+r.player+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;font-weight:700;">'+r.propType+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;">'+r.line+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;text-transform:capitalize;">'+r.side+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;font-weight:700;color:'+(tierColors[r.tier]||'var(--text3)')+';">'+r.tier+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;">'+r.actual+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;font-weight:700;color:'+rClr+';">'+r.result+'</td>'+
+      '<td style="padding:7px 10px;text-align:center;"><button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:10px;" onclick="labDeletePick('+r.id+')">✕</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function labDeletePick(id) {
+  LAB_TRACKER = LAB_TRACKER.filter(function(r){ return r.id !== id; });
+  safeSave('mlb_lab_tracker', JSON.stringify(LAB_TRACKER));
+  labRenderTracker();
+}
+
+function labClearTracker() {
+  if (!confirm('Clear all '+LAB_TRACKER.length+' logged picks? This cannot be undone.')) return;
+  LAB_TRACKER = [];
+  safeSave('mlb_lab_tracker', '[]');
+  labRenderTracker();
+}
+
+function labExportTracker() {
+  if (!LAB_TRACKER.length) { alert('No picks to export.'); return; }
+  var hdr = 'date,player,propType,line,side,tier,actual,result';
+  var rows = LAB_TRACKER.map(function(r){
+    return [r.date,r.player,r.propType,r.line,r.side,r.tier,r.actual,r.result].join(',');
+  });
+  var csv = hdr+'\n'+rows.join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'mlb_season_tracker_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+}
+
+// ── MODEL WEIGHTS ─────────────────────────────────────────────
+function labRestoreWeights() {
+  var saved = safeLoad('mlb_lab_weights');
+  if (saved) { try { LAB_WEIGHTS = JSON.parse(saved); } catch(e){} }
+  var blend = document.getElementById('lab-w-blend');
+  var park  = document.getElementById('lab-w-park');
+  var pit   = document.getElementById('lab-w-pitcher');
+  var form  = document.getElementById('lab-w-form');
+  if (blend) blend.value = LAB_WEIGHTS.lineBlend   || 50;
+  if (park)  park.value  = LAB_WEIGHTS.parkFactor  || 100;
+  if (pit)   pit.value   = LAB_WEIGHTS.pitcherWeight|| 100;
+  if (form)  form.value  = LAB_WEIGHTS.formWeight   || 100;
+  labUpdateWeightLabels();
+  labRenderSavedWeights();
+}
+
+function labUpdateWeightLabels() {
+  var blend = parseInt((document.getElementById('lab-w-blend')||{}).value||50);
+  var park  = parseInt((document.getElementById('lab-w-park')||{}).value||100);
+  var pit   = parseInt((document.getElementById('lab-w-pitcher')||{}).value||100);
+  var form  = parseInt((document.getElementById('lab-w-form')||{}).value||100);
+  var bv = document.getElementById('lab-w-blend-val');
+  var pv = document.getElementById('lab-w-park-val');
+  var ptv= document.getElementById('lab-w-pitcher-val');
+  var fv = document.getElementById('lab-w-form-val');
+  if (bv) bv.textContent = blend+'% Stats / '+(100-blend)+'% Line';
+  if (pv) pv.textContent = (park/100).toFixed(1)+'×';
+  if (ptv) ptv.textContent = (pit/100).toFixed(1)+'×';
+  if (fv) fv.textContent = (form/100).toFixed(1)+'×';
+}
+
+function labSaveWeights() {
+  LAB_WEIGHTS = {
+    lineBlend: parseInt((document.getElementById('lab-w-blend')||{}).value||50),
+    parkFactor: parseInt((document.getElementById('lab-w-park')||{}).value||100),
+    pitcherWeight: parseInt((document.getElementById('lab-w-pitcher')||{}).value||100),
+    formWeight: parseInt((document.getElementById('lab-w-form')||{}).value||100)
+  };
+  safeSave('mlb_lab_weights', JSON.stringify(LAB_WEIGHTS));
+  showStatus('lab-w-status','✅ Weights saved. They apply to the next scoreProps() call.','ok');
+  labRenderSavedWeights();
+}
+
+function labResetWeights() {
+  LAB_WEIGHTS = {lineBlend:50, parkFactor:100, pitcherWeight:100, formWeight:100};
+  safeSave('mlb_lab_weights', JSON.stringify(LAB_WEIGHTS));
+  labRestoreWeights();
+  showStatus('lab-w-status','↺ Reset to defaults (all 1.0×, 50/50 blend).','info');
+}
+
+function labRenderSavedWeights() {
+  var el = document.getElementById('lab-w-saved-display');
+  if (!el) return;
+  var w = LAB_WEIGHTS;
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;">'+
+    '<div><span style="color:var(--text3);">Stats/Line Blend:</span> <strong style="color:var(--gold);">'+(w.lineBlend||50)+'% Stats</strong></div>'+
+    '<div><span style="color:var(--text3);">Park Factor:</span> <strong style="color:var(--gold);">'+(((w.parkFactor||100)/100).toFixed(1))+'×</strong></div>'+
+    '<div><span style="color:var(--text3);">Pitcher Weight:</span> <strong style="color:var(--gold);">'+(((w.pitcherWeight||100)/100).toFixed(1))+'×</strong></div>'+
+    '<div><span style="color:var(--text3);">Recent Form:</span> <strong style="color:var(--gold);">'+(((w.formWeight||100)/100).toFixed(1))+'×</strong></div>'+
+    '</div>';
+}
+
+function labPreviewWeightImpact() {
+  var impactEl = document.getElementById('lab-w-impact-rows');
+  if (!impactEl) return;
+  if (!PICKS_DATA.length) {
+    impactEl.innerHTML='<span style="color:var(--text3);font-size:12px;">No props loaded — load data first.</span>'; return;
+  }
+  var blend = parseInt((document.getElementById('lab-w-blend')||{}).value||50);
+  var parkMult = parseInt((document.getElementById('lab-w-park')||{}).value||100)/100;
+  var pitMult  = parseInt((document.getElementById('lab-w-pitcher')||{}).value||100)/100;
+
+  // Show top 5 picks and how edge changes under new weights
+  var top5 = PICKS_DATA.slice().sort(function(a,b){ return (b.edge||0)-(a.edge||0); }).slice(0,5);
+  impactEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.4px;margin-bottom:8px;">EDGE PREVIEW (TOP 5 PICKS)</div>' +
+    top5.map(function(p){
+      // Simple illustrative adjustment: park factor scales edge, pitcher weight damps/boosts for batter props
+      var adjEdge = p.edge || 0;
+      if (p.propType==='HR'||p.propType==='H'||p.propType==='TB'||p.propType==='R') adjEdge *= parkMult;
+      if (p.propType==='K'||p.propType==='H-Allowed') adjEdge *= pitMult;
+      adjEdge = Math.round(adjEdge*10)/10;
+      var delta = Math.round((adjEdge - (p.edge||0))*10)/10;
+      var dStr = delta===0?'—':(delta>0?'+'+delta+'%':delta+'%');
+      var dClr = delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)';
+      return '<div class="bt-by-type-row"><span style="font-size:11px;flex:1;">'+p.player+' '+p.propType+'</span>'+
+        '<span style="font-size:11px;color:var(--gold);width:50px;text-align:right;">'+(p.edge>=0?'+':'')+p.edge+'%</span>'+
+        '<span style="font-size:11px;color:'+dClr+';width:50px;text-align:right;">'+dStr+'</span></div>';
+    }).join('');
+}
+
+/* ============================================================
+   END OF MLB EDGE MODEL v1.3
+   ============================================================ */
+
+</script>
+</body>
+</html>

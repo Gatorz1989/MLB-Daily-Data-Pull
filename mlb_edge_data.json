@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-10-15T00:00:00Z",
+  "pull_date": "2026-10-15",
+  "version": "mlb_edge_data_pull/v1.0",
+  "games": [],
+  "props": [],
+  "batters": [],
+  "pitchers": [],
+  "_counts": {
+    "games": 0,
+    "props": 0,
+    "batters": 0,
+    "pitchers": 0
+  },
+  "_note": "Stub file — replace by running mlb_edge_data_pull.py or waiting for the GitHub Actions daily pull."
+}
