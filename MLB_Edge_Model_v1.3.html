@@ -1632,16 +1632,15 @@ function dcTestBigBall(){
   var k=(document.getElementById('dc-bigball-key').value||safeLoad('mlb_bigball_key')).trim();
   if(!k){showStatus('bigball-status','⚠️ Enter BigBallsData key first.','warn');return;}
   showStatus('bigball-status','⏳ Testing BigBallsData…','info');
-  fetch('https://api.bigballsdata.com/v1/mlb/player-stats?season='+new Date().getFullYear(), {
+  fetch('https://api.bigballsdata.com/v1/injuries?sport=baseball', {
     headers:{'Authorization':'Bearer '+k,'x-api-key':k}
   })
     .then(function(r){
-      if(r.ok){showStatus('bigball-status','✅ BigBallsData key valid.','ok');safeSave('mlb_bigball_key',k);}
-      else if(r.status===401){showStatus('bigball-status','❌ 401 — key rejected. Check your BigBallsData dashboard.','err');}
-      else if(r.status===404){showStatus('bigball-status','⚠️ 404 — key OK but endpoint path needs verification. Contact BigBallsData support for the MLB player stats URL.','warn');}
-      else{showStatus('bigball-status','❌ Error '+r.status,'err');}
+      if(r.ok){showStatus('bigball-status','✅ BigBallsData key valid — injuries endpoint confirmed.','ok');safeSave('mlb_bigball_key',k);}
+      else if(r.status===401){showStatus('bigball-status','❌ 401 — key rejected. Regenerate on your BigBallsData dashboard.','err');}
+      else{showStatus('bigball-status','⚠️ HTTP '+r.status+' — key saved. Run mlb_edge_data_pull.py to verify full access.','warn');safeSave('mlb_bigball_key',k);}
     })
-    .catch(function(e){showStatus('bigball-status','❌ Network error (possible CORS block): '+e.message,'err');});
+    .catch(function(e){showStatus('bigball-status','⚠️ CORS block (browser limitation) — key saved. Injuries will pull via mlb_edge_data_pull.py.','warn');safeSave('mlb_bigball_key',k);});
 }
 function dcSaveHeyGen(){var k=(document.getElementById('dc-heygen-key').value||'').trim();safeSave('mlb_heygen_key',k);showStatus('heygen-status',k?'✅ HeyGen key saved.':'Key cleared.',k?'ok':'warn');}
 function dcSaveHeyGenMeta(){

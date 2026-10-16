@@ -61,7 +61,8 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════════════════════
 
 ODDS_API_BASE  = "https://api.the-odds-api.com/v4"
-BIGBALL_BASE   = "https://api.bigdataball.com/v1"   # adjust if endpoint differs
+BIGBALL_BASE   = "https://api.bigballsdata.com/v1"
+MLB_STATS_BASE = "https://statsapi.mlb.com/api/v1"   # free, no key required
 
 SPORT          = "baseball_mlb"
 DEFAULT_REGION = "us"
@@ -236,7 +237,7 @@ def _parse_game_lines(raw: list) -> list[dict]:
             "time":        fmt_time(commence),
             "park":        f"{home} Park",
             "homeTeamSlug": TEAM_SLUG.get(home, ""),
-            # SP placeholders — filled if BigDataBall provides starters
+            # SP placeholders — filled if BigBallsData provides starters
             "homePitcher": "TBD", "awayPitcher": "TBD",
             "homeERA": 0, "awayERA": 0,
             "homeK9":  0, "awayK9":  0,
@@ -408,86 +409,130 @@ def _guess_team(player: str, market_key: str, home: str, away: str) -> str:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# BIGDATABALL  — PLAYER STATS
+# MLB STATS API  — SEASON BATTING & PITCHING  (free, no key required)
 # ═══════════════════════════════════════════════════════════════════════════
 
-def fetch_bigball_stats(api_key: str, season: str = "2026") -> tuple[list[dict], list[dict]]:
-    """
-    Pull season batter and pitcher stats from BigDataBall.
-    Returns (batters, pitchers).
-    Falls back to empty lists if key not set or API unavailable.
-    """
-    if not api_key:
-        log.info("BigDataBall key not set — skipping stats pull.")
-        return [], []
+def _per_game(total: float, games: int) -> float:
+    return round(total / max(games, 1), 3)
 
-    batters  = _fetch_bigball_batters(api_key, season)
-    pitchers = _fetch_bigball_pitchers(api_key, season)
+
+def fetch_mlb_stats(season: str = "2026") -> tuple[list[dict], list[dict]]:
+    """
+    Pull full-season batting and pitching stats from statsapi.mlb.com.
+    Free, no API key required. Returns (batters, pitchers).
+    """
+    batters  = _fetch_mlb_batting(season)
+    pitchers = _fetch_mlb_pitching(season)
     return batters, pitchers
 
 
-def _fetch_bigball_batters(api_key: str, season: str) -> list[dict]:
-    url = f"{BIGBALL_BASE}/mlb/stats/batting"
-    params = {"season": season, "api_key": api_key}
+def _fetch_mlb_batting(season: str) -> list[dict]:
+    url    = f"{MLB_STATS_BASE}/stats"
+    params = {"stats": "season", "group": "hitting", "gameType": "R",
+              "season": season, "sportId": 1, "limit": 1000}
     try:
-        log.info("Fetching batter stats from BigDataBall …")
+        log.info("Fetching MLB batting stats from statsapi.mlb.com …")
         resp = requests.get(url, params=params, timeout=20)
         resp.raise_for_status()
-        raw = resp.json()
-        players = raw if isinstance(raw, list) else raw.get("data", raw.get("players", []))
+        splits = resp.json().get("stats", [{}])[0].get("splits", [])
         result = []
-        for p in players:
+        for s in splits:
+            p  = s.get("player", {})
+            t  = s.get("team", {})
+            st = s.get("stat", {})
+            gp = int(st.get("gamesPlayed") or 1)
             result.append({
-                "name": p.get("name") or p.get("player_name", ""),
-                "team": p.get("team", ""),
-                "avg":  float(p.get("avg") or p.get("batting_avg") or 0),
-                "obp":  float(p.get("obp") or p.get("on_base_pct") or 0),
-                "slg":  float(p.get("slg") or p.get("slugging_pct") or 0),
-                "ops":  float(p.get("ops") or 0),
-                "hr":   int(p.get("hr") or p.get("home_runs") or 0),
-                "rbi":  int(p.get("rbi") or 0),
-                # Per-game averages for edge calculation
-                "_h_pg":  float(p.get("h_per_game") or p.get("hits_per_game") or 0),
-                "_hr_pg": float(p.get("hr_per_game") or p.get("home_runs_per_game") or 0),
-                "_rbi_pg":float(p.get("rbi_per_game") or 0),
-                "_tb_pg": float(p.get("tb_per_game") or p.get("total_bases_per_game") or 0),
-                "_bb_pg": float(p.get("bb_per_game") or p.get("walks_per_game") or 0),
-                "_k_pg":  float(p.get("k_per_game") or p.get("strikeouts_per_game") or 0),
+                "name":    p.get("fullName", ""),
+                "team":    t.get("abbreviation", ""),
+                "avg":     float(st.get("avg") or 0),
+                "obp":     float(st.get("obp") or 0),
+                "slg":     float(st.get("slg") or 0),
+                "ops":     float(st.get("ops") or 0),
+                "hr":      int(st.get("homeRuns") or 0),
+                "rbi":     int(st.get("rbi") or 0),
+                "_h_pg":   _per_game(float(st.get("hits") or 0), gp),
+                "_hr_pg":  _per_game(float(st.get("homeRuns") or 0), gp),
+                "_rbi_pg": _per_game(float(st.get("rbi") or 0), gp),
+                "_tb_pg":  _per_game(float(st.get("totalBases") or 0), gp),
+                "_bb_pg":  _per_game(float(st.get("baseOnBalls") or 0), gp),
+                "_k_pg":   _per_game(float(st.get("strikeOuts") or 0), gp),
             })
         log.info(f"  {len(result)} batters loaded")
         return result
     except Exception as e:
-        log.warning(f"BigDataBall batters failed: {e}")
+        log.warning(f"MLB batting stats failed: {e}")
         return []
 
 
-def _fetch_bigball_pitchers(api_key: str, season: str) -> list[dict]:
-    url = f"{BIGBALL_BASE}/mlb/stats/pitching"
-    params = {"season": season, "api_key": api_key}
+def _fetch_mlb_pitching(season: str) -> list[dict]:
+    url    = f"{MLB_STATS_BASE}/stats"
+    params = {"stats": "season", "group": "pitching", "gameType": "R",
+              "season": season, "sportId": 1, "limit": 500}
     try:
-        log.info("Fetching pitcher stats from BigDataBall …")
+        log.info("Fetching MLB pitching stats from statsapi.mlb.com …")
         resp = requests.get(url, params=params, timeout=20)
         resp.raise_for_status()
-        raw = resp.json()
-        players = raw if isinstance(raw, list) else raw.get("data", raw.get("players", []))
+        splits = resp.json().get("stats", [{}])[0].get("splits", [])
         result = []
-        for p in players:
+        for s in splits:
+            p  = s.get("player", {})
+            t  = s.get("team", {})
+            st = s.get("stat", {})
+            gs = int(st.get("gamesStarted") or 1)
             result.append({
-                "name":  p.get("name") or p.get("player_name", ""),
-                "team":  p.get("team", ""),
-                "era":   float(p.get("era") or 0),
-                "whip":  float(p.get("whip") or 0),
-                "k9":    float(p.get("k9") or p.get("strikeouts_per_9") or 0),
-                "bb9":   float(p.get("bb9") or p.get("walks_per_9") or 0),
-                "wins":  int(p.get("wins") or p.get("w") or 0),
-                "ip":    float(p.get("ip") or p.get("innings_pitched") or 0),
-                # Per-start averages for edge calculation
-                "_k_per_start": float(p.get("k_per_start") or p.get("strikeouts_per_start") or 0),
+                "name":  p.get("fullName", ""),
+                "team":  t.get("abbreviation", ""),
+                "era":   float(st.get("era") or 0),
+                "whip":  float(st.get("whip") or 0),
+                "k9":    float(st.get("strikeoutsPer9Inn") or 0),
+                "bb9":   float(st.get("walksPer9Inn") or 0),
+                "wins":  int(st.get("wins") or 0),
+                "ip":    float(st.get("inningsPitched") or 0),
+                "_k_per_start": _per_game(float(st.get("strikeOuts") or 0), gs),
             })
         log.info(f"  {len(result)} pitchers loaded")
         return result
     except Exception as e:
-        log.warning(f"BigDataBall pitchers failed: {e}")
+        log.warning(f"MLB pitching stats failed: {e}")
+        return []
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# BIGBALLSDATA  — INJURIES
+# ═══════════════════════════════════════════════════════════════════════════
+
+def fetch_bigball_injuries(api_key: str) -> list[dict]:
+    """
+    Pull current MLB injury list from BigBallsData.
+    Returns list of {player, team, status, description} dicts.
+    Falls back to empty list if key not set or API unavailable.
+    """
+    if not api_key:
+        log.info("BigBallsData key not set — skipping injury pull.")
+        return []
+    url     = f"{BIGBALL_BASE}/injuries"
+    headers = {"Authorization": f"Bearer {api_key}", "x-api-key": api_key}
+    params  = {"sport": "baseball"}
+    try:
+        log.info("Fetching MLB injuries from BigBallsData …")
+        resp = requests.get(url, headers=headers, params=params, timeout=20)
+        resp.raise_for_status()
+        raw      = resp.json()
+        injuries = raw if isinstance(raw, list) else raw.get("data", raw.get("injuries", []))
+        result   = []
+        for inj in injuries:
+            player = (inj.get("player_name") or inj.get("name")
+                      or (inj.get("player") or {}).get("name", ""))
+            result.append({
+                "player":      player,
+                "team":        inj.get("team") or inj.get("team_name", ""),
+                "status":      inj.get("status") or inj.get("injury_status", ""),
+                "description": inj.get("description") or inj.get("injury_type") or inj.get("notes", ""),
+            })
+        log.info(f"  {len(result)} injuries loaded")
+        return result
+    except Exception as e:
+        log.warning(f"BigBallsData injuries failed: {e}")
         return []
 
 
@@ -582,7 +627,7 @@ def enrich_props_with_projections(
 
 def attach_sp_stats(games: list[dict], pitchers: list[dict]) -> list[dict]:
     """
-    Try to match starting pitcher names from game data (if BigDataBall
+    Try to match starting pitcher names from game data (if BigBallsData
     provides them) to stats. If pitchers list is empty, games come back
     with TBD starters.
     """
@@ -608,6 +653,7 @@ def build_output(
     props: list[dict],
     batters: list[dict],
     pitchers: list[dict],
+    injuries: list[dict],
     date_str: str,
 ) -> dict:
     """
@@ -625,17 +671,19 @@ def build_output(
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "pull_date":    date_str,
-        "version":      "mlb_edge_data_pull/v1.0",
+        "version":      "mlb_edge_data_pull/v1.1",
         "games":        games,
         "props":        props,
         "batters":      clean_batters,
         "pitchers":     clean_pitchers,
+        "injuries":     injuries,
         # Summary counts (convenience — model also computes these)
         "_counts": {
             "games":    len(games),
             "props":    len(props),
             "batters":  len(clean_batters),
             "pitchers": len(clean_pitchers),
+            "injuries": len(injuries),
             "elite":    sum(1 for p in props if p.get("tier") == "ELITE"),
             "strong":   sum(1 for p in props if p.get("tier") == "STRONG"),
         }
@@ -657,7 +705,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--books",     default=None,         help="Comma-separated bookmakers")
     p.add_argument("--edge-min",  type=float, default=0.0, help="Minimum edge %% to include (default: 0)")
     p.add_argument("--no-props",  action="store_true",  help="Skip player prop pull")
-    p.add_argument("--no-stats",  action="store_true",  help="Skip BigDataBall stats pull")
+    p.add_argument("--no-stats",  action="store_true",  help="Skip MLB Stats API pull (statsapi.mlb.com)")
     p.add_argument("--dry-run",   action="store_true",  help="Print output, don't write file")
     p.add_argument("--verbose",   action="store_true",  help="Debug logging")
     return p.parse_args()
@@ -695,12 +743,15 @@ def main() -> None:
     if not args.no_props and games:
         props = fetch_props(odds_key, games, region, books)
 
-    # ── Step 3: Player stats (BigDataBall) ─────────────────────────────
+    # ── Step 3: Player stats (MLB Stats API — free, no key) ────────────
     batters:  list[dict] = []
     pitchers: list[dict] = []
     if not args.no_stats:
         season = str(datetime.now().year)
-        batters, pitchers = fetch_bigball_stats(bigball_key, season)
+        batters, pitchers = fetch_mlb_stats(season)
+
+    # ── Step 3b: Injuries (BigBallsData) ───────────────────────────────
+    injuries: list[dict] = fetch_bigball_injuries(bigball_key)
 
     # ── Step 4: Enrich props with projections / edge calc ───────────────
     if props and (batters or pitchers):
@@ -714,7 +765,7 @@ def main() -> None:
         games = attach_sp_stats(games, pitchers)
 
     # ── Step 6: Build output ────────────────────────────────────────────
-    output = build_output(games, props, batters, pitchers, date_str)
+    output = build_output(games, props, batters, pitchers, injuries, date_str)
 
     counts = output["_counts"]
     log.info(f"━━━  Summary  ━━━")
