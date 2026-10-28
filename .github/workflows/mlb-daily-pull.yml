@@ -2,7 +2,7 @@ name: MLB Daily Data Pull
 
 on:
   schedule:
-    # Runs at 8:00 AM ET (15:00 UTC) — after morning lines are set
+    # Runs at 11:00 AM ET (15:00 UTC) — after morning lines are set
     - cron: '0 15 * * *'
   workflow_dispatch:   # manual trigger from the Actions tab
 
@@ -27,11 +27,11 @@ jobs:
       - name: Run MLB data pull
         env:
           ODDS_API_KEY:    ${{ secrets.ODDS_API_KEY }}
-          BIGBALL_API_KEY: ${{ secrets.BIGBALL_API_KEY }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
           ODDS_REGION:     us
           ODDS_BOOKS:      draftkings,fanduel,betmgm,bet365_us
         run: |
-          python mlb_edge_data_pull.py \
+          python mlb_edge_data_pull_v2.0.py \
             --out mlb_edge_data.json \
             --verbose
 
