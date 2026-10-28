@@ -31,7 +31,7 @@ jobs:
           ODDS_REGION:     us
           ODDS_BOOKS:      draftkings,fanduel,betmgm,bet365_us
         run: |
-          python mlb_edge_data_pull_v2.0.py \
+          python mlb_edge_data_pull_v2_0.py \
             --out mlb_edge_data.json \
             --verbose
 
